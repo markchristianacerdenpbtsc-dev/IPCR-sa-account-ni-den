@@ -1,57 +1,59 @@
-        .sidebar-hidden {
-            display: none;
-        }
-        @media (min-width: 1024px) {
-            .sidebar-hidden {
-                display: block !important;
-            }
-        }
-        
-        /* Sidebar slide animation */
-        #sidebar {
-            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-        }
-        
-        @media (max-width: 1023px) {
-            #sidebar.sidebar-hidden {
-                transform: translateX(-100%);
-                opacity: 0;
-                pointer-events: none;
-            }
-            
-            #sidebar:not(.sidebar-hidden) {
-                transform: translateX(0);
-                opacity: 1;
-                pointer-events: auto;
-            }
-        }
-        
-        /* Overlay fade animation */
-        #sidebarOverlay {
-            transition: opacity 0.3s ease-in-out;
-        }
-        
-        #sidebarOverlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        
-        #sidebarOverlay:not(.hidden) {
-            opacity: 1;
-            pointer-events: auto;
-        }
+.sidebar-hidden {
+    display: none;
+}
+@media (min-width: 1024px) {
+    .sidebar-hidden {
+        display: block !important;
+    }
+}
 
-        @keyframes scaleIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
+/* Sidebar slide animation */
+#sidebar {
+    transition:
+        transform 0.3s ease-in-out,
+        opacity 0.3s ease-in-out;
+}
 
-        .animate-scale-in {
-            animation: scaleIn 0.2s ease-out;
-        }
+@media (max-width: 1023px) {
+    #sidebar.sidebar-hidden {
+        transform: translateX(-100%);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    #sidebar:not(.sidebar-hidden) {
+        transform: translateX(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+/* Overlay fade animation */
+#sidebarOverlay {
+    transition: opacity 0.3s ease-in-out;
+}
+
+#sidebarOverlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#sidebarOverlay:not(.hidden) {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+}

@@ -1,42 +1,44 @@
-        .sidebar-hidden {
-            display: none;
-        }
-        @media (min-width: 1024px) {
-            .sidebar-hidden {
-                display: block !important;
-            }
-        }
-        
-        /* Sidebar slide animation */
-        #sidebar {
-            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-        }
-        
-        @media (max-width: 1023px) {
-            #sidebar.sidebar-hidden {
-                transform: translateX(-100%);
-                opacity: 0;
-                pointer-events: none;
-            }
-            
-            #sidebar:not(.sidebar-hidden) {
-                transform: translateX(0);
-                opacity: 1;
-                pointer-events: auto;
-            }
-        }
-        
-        /* Overlay fade animation */
-        #sidebarOverlay {
-            transition: opacity 0.3s ease-in-out;
-        }
-        
-        #sidebarOverlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        
-        #sidebarOverlay:not(.hidden) {
-            opacity: 1;
-            pointer-events: auto;
-        }
+.sidebar-hidden {
+    display: none;
+}
+@media (min-width: 1024px) {
+    .sidebar-hidden {
+        display: block !important;
+    }
+}
+
+/* Sidebar slide animation */
+#sidebar {
+    transition:
+        transform 0.3s ease-in-out,
+        opacity 0.3s ease-in-out;
+}
+
+@media (max-width: 1023px) {
+    #sidebar.sidebar-hidden {
+        transform: translateX(-100%);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    #sidebar:not(.sidebar-hidden) {
+        transform: translateX(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+/* Overlay fade animation */
+#sidebarOverlay {
+    transition: opacity 0.3s ease-in-out;
+}
+
+#sidebarOverlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#sidebarOverlay:not(.hidden) {
+    opacity: 1;
+    pointer-events: auto;
+}
