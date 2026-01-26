@@ -6,10 +6,6 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
-                // Main app files
-                'resources/css/app.css',
-                'resources/js/app.js',
-                
                 // Auth pages
                 'resources/css/auth_login.css',
                 'resources/css/auth_login-selection.css',
