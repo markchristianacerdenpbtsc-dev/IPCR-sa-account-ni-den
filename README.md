@@ -421,7 +421,7 @@ This project is open-sourced software licensed under the MIT license.
 
 ## 👨‍💻 Developer
 
-**Developed by:** Duyaigit Paghubasan  
+**Developed by:** Jarlo Ken E. Paghubasan  
 **GitHub:** [@jarlokenpaghubasan](https://github.com/jarlokenpaghubasan)
 
 ---
