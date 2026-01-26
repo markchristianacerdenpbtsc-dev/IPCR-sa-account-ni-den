@@ -1,0 +1,120 @@
+        .sidebar-hidden {
+            display: none;
+        }
+        @media (min-width: 1024px) {
+            .sidebar-hidden {
+                display: block !important;
+            }
+        }
+        
+        /* Sidebar slide animation */
+        #sidebar {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        
+        @media (max-width: 1023px) {
+            #sidebar.sidebar-hidden {
+                transform: translateX(-100%);
+                opacity: 0;
+                pointer-events: none;
+            }
+            
+            #sidebar:not(.sidebar-hidden) {
+                transform: translateX(0);
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+        
+        /* Overlay fade animation */
+        #sidebarOverlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        #sidebarOverlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        #sidebarOverlay:not(.hidden) {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-scale-in {
+            animation: scaleIn 0.2s ease-out;
+        }
+
+        /* Compact user card for mobile */
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 0.75rem;
+        }
+
+        .user-card-photo {
+            flex-shrink: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            object-fit: cover;
+            border: 2px solid #d1d5db;
+        }
+
+        .user-card-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-card-name {
+            font-weight: 600;
+            color: #111827;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-card-role {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .user-card-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .user-card-action-btn {
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .user-card-action-btn:hover {
+            background: #f3f4f6;
+        }

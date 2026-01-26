@@ -6,29 +6,7 @@
     <title>View User - Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        #sidebar {
-            transition: transform 0.3s ease-in-out;
-        }
-
-        #sidebar.open {
-            transform: translateX(0);
-        }
-
-        #sidebarOverlay {
-            transition: opacity 0.3s ease-in-out;
-        }
-
-        #sidebarOverlay.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        #sidebarOverlay:not(.visible) {
-            opacity: 0;
-            pointer-events: none;
-        }
-    </style>
+    @vite(['resources/css/admin_users_show.css', 'resources/js/admin_users_show.js'])
 </head>
 <body class="bg-gray-50">
     <div class="flex h-screen bg-gray-50">
@@ -244,34 +222,5 @@
         </div>
     </div>
 
-    <script>
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('visible');
-        }
-
-        // Close sidebar when clicking overlay
-        document.getElementById('sidebarOverlay').addEventListener('click', toggleSidebar);
-
-        // Close sidebar on navigation
-        document.querySelectorAll('#sidebar a').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth < 1024) {
-                    toggleSidebar();
-                }
-            });
-        });
-
-        // Close sidebar when resizing to desktop
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 1024) {
-                document.getElementById('sidebar').classList.remove('open');
-                document.getElementById('sidebarOverlay').classList.remove('visible');
-            }
-        });
-    </script>
 </body>
 </html>

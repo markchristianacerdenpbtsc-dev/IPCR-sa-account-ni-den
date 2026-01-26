@@ -6,50 +6,7 @@
     <title>Admin Dashboard - IPCR/OPCR Module</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .sidebar-hidden {
-            display: none;
-        }
-        @media (min-width: 1024px) {
-            .sidebar-hidden {
-                display: block !important;
-            }
-        }
-        
-        /* Sidebar slide animation */
-        #sidebar {
-            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-        }
-        
-        @media (max-width: 1023px) {
-            #sidebar.sidebar-hidden {
-                transform: translateX(-100%);
-                opacity: 0;
-                pointer-events: none;
-            }
-            
-            #sidebar:not(.sidebar-hidden) {
-                transform: translateX(0);
-                opacity: 1;
-                pointer-events: auto;
-            }
-        }
-        
-        /* Overlay fade animation */
-        #sidebarOverlay {
-            transition: opacity 0.3s ease-in-out;
-        }
-        
-        #sidebarOverlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        
-        #sidebarOverlay:not(.hidden) {
-            opacity: 1;
-            pointer-events: auto;
-        }
-    </style>
+    @vite(['resources/css/dashboard_admin_index.css', 'resources/js/dashboard_admin_index.js'])
 </head>
 <body class="bg-gray-50">
     <div class="flex h-screen bg-gray-50">
@@ -227,50 +184,5 @@
         </div>
     </div>
 
-    <script>
-        // Toggle sidebar visibility
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            
-            sidebar.classList.toggle('sidebar-hidden');
-            overlay.classList.toggle('hidden');
-        }
-
-        // Close sidebar when clicking a link
-        document.querySelectorAll('#sidebar a, #sidebar button').forEach(element => {
-            element.addEventListener('click', () => {
-                if (window.innerWidth < 1024) {
-                    document.getElementById('sidebar').classList.add('sidebar-hidden');
-                    document.getElementById('sidebarOverlay').classList.add('hidden');
-                }
-            });
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            
-            if (window.innerWidth >= 1024) {
-                // Desktop size - show sidebar
-                sidebar.classList.remove('sidebar-hidden');
-                overlay.classList.add('hidden');
-            } else {
-                // Mobile size - hide sidebar
-                sidebar.classList.add('sidebar-hidden');
-                overlay.classList.add('hidden');
-            }
-        });
-
-        // Initialize on page load
-        window.addEventListener('load', () => {
-            const sidebar = document.getElementById('sidebar');
-            
-            if (window.innerWidth < 1024) {
-                sidebar.classList.add('sidebar-hidden');
-            }
-        });
-    </script>
 </body>
 </html>

@@ -13,6 +13,45 @@ A comprehensive Individual Performance Commitment and Review (IPCR) management s
 - 🔑 **Password Management** with secure hashing
 - 🕒 **Last Login Tracking**
 - 🌏 **Hong Kong Timezone (Asia/Hong_Kong)**
+- ⚡ **Vite Asset Bundling** with optimized CSS/JS
+- 🎨 **Tailwind CSS v4.0** for modern styling
+
+## 📦 Latest Updates (January 27, 2026)
+
+### Vite Integration & Code Refactoring
+- ✅ **Extracted all inline CSS/JS** from 9 blade templates into external files
+- ✅ **Configured Vite** to bundle all assets with hot module replacement
+- ✅ **Optimized JavaScript** - Exposed functions to global scope for Vite compatibility
+- ✅ **Production-ready builds** - All assets hashed for cache-busting
+- ✅ **Fixed mobile menu & notifications** - Now working with bundled assets
+
+### Files Refactored
+**CSS Files Created (9):**
+- `resources/css/admin_users_edit.css`
+- `resources/css/admin_users_index.css`
+- `resources/css/admin_users_show.css`
+- `resources/css/auth_login.css`
+- `resources/css/auth_login-selection.css`
+- `resources/css/dashboard_admin_index.css`
+- `resources/css/dashboard_faculty_index.css`
+- `resources/css/dashboard_faculty_profile.css`
+- `resources/css/dashboard_faculty_my-ipcrs.css`
+
+**JS Files Created (8):**
+- `resources/js/admin_users_edit.js`
+- `resources/js/admin_users_index.js`
+- `resources/js/admin_users_show.js`
+- `resources/js/auth_login.js`
+- `resources/js/dashboard_admin_index.js`
+- `resources/js/dashboard_faculty_index.js`
+- `resources/js/dashboard_faculty_profile.js`
+- `resources/js/dashboard_faculty_my-ipcrs.js`
+
+### Technical Improvements
+- 🔧 **vite.config.js** - Configured with 17 entry points
+- 🔧 **window.function** pattern - All interactive functions exposed globally
+- 🔧 **@vite directive** - All blade files now use Laravel Vite plugin
+- 🔧 **Build optimization** - Assets reduced from ~200KB to gzipped builds
 
 ---
 
