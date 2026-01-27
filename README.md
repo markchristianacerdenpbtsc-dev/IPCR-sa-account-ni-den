@@ -18,9 +18,21 @@ A comprehensive Individual Performance Commitment and Review (IPCR) management s
 
 ## 📦 Latest Updates (January 27, 2026)
 
+### Admin Protection & UI Improvements
+- 🔒 **Protected Administrator Account** - Main admin account (URS26-ADM00001) cannot be edited, deleted, or deactivated
+- 🎨 **Compact Table Design** - User management table redesigned with reduced padding and spacing
+- 📊 **No Department for Admin** - Administrator account has no department/designation assignment
+- 🔐 **Lock Icon Indicator** - Admin account displays lock icon instead of edit/delete buttons
+
+### Database Seeding Update
+- ✅ **Simplified UserSeeder** - Now creates only the admin user (previously created 8 sample users)
+- ✅ **Updated credentials** - Admin password changed to `password` for consistency
+- ✅ **Cleaner setup** - Removed outdated sample users (Director, Deans, Faculty)
+- ✅ **Aligned with schema** - Seeder now matches actual database structure
+
 ### Vite Integration & Code Refactoring
-- ✅ **Extracted all inline CSS/JS** from 9 blade templates into external files
-- ✅ **Configured Vite** to bundle all assets with hot module replacement
+- ✅ **Extracted all inline CSS/JS** - From 9 blade templates into external files
+- ✅ **Configured Vite** - Bundle all assets with hot module replacement
 - ✅ **Optimized JavaScript** - Exposed functions to global scope for Vite compatibility
 - ✅ **Production-ready builds** - All assets hashed for cache-busting
 - ✅ **Fixed mobile menu & notifications** - Now working with bundled assets
@@ -59,50 +71,76 @@ A comprehensive Individual Performance Commitment and Review (IPCR) management s
 
 ### Prerequisites
 
-Make sure you have the following installed:
-- PHP >= 8.1
-- Composer
-- MySQL/MariaDB
-- Node.js & NPM (for frontend assets)
-- XAMPP (recommended for Windows)
+Make sure you have the following installed on your computer:
+- **PHP >= 8.1** - [Download PHP](https://www.php.net/downloads)
+- **Composer** - [Download Composer](https://getcomposer.org/download/)
+- **MySQL/MariaDB** - Database server
+- **Node.js & NPM** (v16 or higher) - [Download Node.js](https://nodejs.org/)
+- **XAMPP** (recommended for Windows) - [Download XAMPP](https://www.apachefriends.org/)
+  - Includes PHP, MySQL, and Apache in one package
+
+**Note:** If using XAMPP, make sure Apache and MySQL services are running before proceeding.
 
 ---
 
-### 📋 Step-by-Step Setup
+### 📋 Step-by-Step Setup (Fresh Installation on Another Computer)
 
 #### 1️⃣ Clone the Repository
+
+Open your terminal/command prompt and run:
 
 ```bash
 git clone https://github.com/jarlokenpaghubasan/IPCR.git
 cd IPCR
 ```
 
+**Or download the ZIP file:**
+- Download the repository as ZIP from GitHub
+- Extract it to your desired location (e.g., `C:\xampp\htdocs\IPCR` for Windows)
+- Open terminal/command prompt and navigate to the project folder
+
 ---
 
-#### 2️⃣ Install Dependencies
+#### 2️⃣ Install PHP Dependencies
+
+Make sure you're in the project directory, then run:
 
 ```bash
-# Install PHP dependencies
 composer install
-
-# Install NPM dependencies
-npm install
-
-# Build frontend assets
-npm run build
 ```
+
+**If you encounter errors:**
+- Make sure Composer is installed and in your PATH
+- Check that PHP version is 8.1 or higher: `php -v`
+- For Windows XAMPP users, you may need to add PHP to PATH or use the full path: `C:\xampp\php\php.exe composer.phar install`
 
 ---
 
-#### 3️⃣ Environment Configuration
+#### 3️⃣ Install NPM Dependencies
 
-Create your `.env` file from the example:
+```bash
+npm install
+```
 
+**If you encounter errors:**
+- Make sure Node.js and NPM are installed: `node -v` and `npm -v`
+- Try clearing npm cache: `npm cache clean --force`
+
+---
+
+#### 4️⃣ Environment Configuration
+
+**For Windows (PowerShell):**
+```powershell
+Copy-Item .env.example .env
+```
+
+**For Linux/Mac:**
 ```bash
 cp .env.example .env
 ```
 
-**Edit the `.env` file** with your database credentials:
+**Edit the `.env` file** with a text editor and configure your database:
 
 ```env
 APP_NAME="IPCR System"
@@ -128,14 +166,31 @@ SESSION_DRIVER=database
 php artisan key:generate
 ```
 
+This will automatically add the APP_KEY to your .env file.
+
 ---
 
-#### 4️⃣ Database Setup
+#### 5️⃣ Database Setup
 
-**Create Database:**
+**Option A: Using phpMyAdmin (Recommended for XAMPP users)**
 
-1. Open phpMyAdmin (http://localhost/phpmyadmin)
-2. Create a new database named `ipcr_system`
+1. Start XAMPP Control Panel
+2. Start Apache and MySQL services
+3. Open phpMyAdmin: http://localhost/phpmyadmin
+4. Click "New" in the left sidebar
+5. Database name: `ipcr_system`
+6. Collation: `utf8mb4_unicode_ci`
+7. Click "Create"
+
+**Option B: Using MySQL Command Line**
+
+```bash
+# For XAMPP on Windows
+C:\xampp\mysql\bin\mysql.exe -u root -e "CREATE DATABASE ipcr_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+# For Linux/Mac
+mysql -u root -e "CREATE DATABASE ipcr_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+```
 
 **Run Migrations:**
 
@@ -151,144 +206,210 @@ This will create all necessary tables:
 - user_photos
 - sessions
 - cache
+- migrations
 
 ---
 
-#### 5️⃣ Storage Setup
+#### 6️⃣ Storage Setup
 
 Create the symbolic link for file storage:
 
+**For Windows (PowerShell - Run as Administrator):**
+```powershell
+php artisan storage:link
+```
+
+**For Linux/Mac:**
 ```bash
 php artisan storage:link
 ```
 
-This creates a symbolic link from `public/storage` to `storage/app/public`.
+This creates a symbolic link from `public/storage` to `storage/app/public` for user photo uploads.
+
+**If you encounter permission errors on Windows:**
+- Right-click PowerShell/Command Prompt and select "Run as Administrator"
+- Or manually create the folder: `mkdir storage\app\public\user_photos`
 
 ---
 
-#### 6️⃣ Create Admin User
+#### 7️⃣ Seed Database with Admin User
 
-Run the database seeder to create departments, designations, and a default admin user:
+Run the database seeder:
 
 ```bash
 php artisan db:seed
 ```
 
-**OR** Create an admin user manually via Tinker:
-
-```bash
-php artisan tinker
-```
-
-Then paste this code:
-
-```php
-use App\Models\User;
-use App\Models\UserRole;
-use Illuminate\Support\Facades\Hash;
-
-// Create admin user
-$admin = User::create([
-    'first_name' => 'Admin',
-    'middle_name' => '',
-    'last_name' => 'User',
-    'employee_id' => 'URS26-ADM00001',
-    'username' => 'admin',
-    'email' => 'admin@ipcr.system',
-    'password' => Hash::make('password123'),
-    'department_id' => 1,
-    'designation_id' => 1,
-    'phone_number' => '09123456789',
-    'is_active' => true,
-]);
-
-// Assign admin role
-UserRole::create([
-    'user_id' => $admin->id,
-    'role_name' => 'admin',
-    'is_primary' => true,
-]);
-
-echo "Admin user created successfully!\n";
-echo "Username: admin\n";
-echo "Password: password123\n";
-exit;
-```
+This will create:
+- **3 Departments:** College of Accountancy (COA), College of Business (COB), College of Computer Studies (CCS)
+- **4 Designations:** Professor, Associate Professor, Assistant Professor, Instructor
+- **1 Admin User:** Administrator account
 
 **Default Admin Credentials:**
 - **Username:** `admin`
-- **Password:** `password123`
+- **Password:** `password`
+- **Employee ID:** `URS26-ADM00001`
+- **Email:** `admin@ipcr.system`
+
+**⚠️ Important:** This admin account is protected and cannot be edited or deleted through the UI.
 
 ---
 
-#### 7️⃣ Create Logo Image Folder
+#### 8️⃣ Create Logo Image Folder
 
-Create the images folder for the system logo:
-
-```bash
-# For Windows (PowerShell)
+**For Windows (PowerShell):**
+```powershell
 New-Item -Path "public/images" -ItemType Directory -Force
+```
 
-# For Linux/Mac
+**For Linux/Mac:**
+```bash
 mkdir -p public/images
 ```
 
-**Add your logo:**
+**Add your logo (Optional):**
 - Place your logo image as `public/images/urs_logo.jpg`
 - Recommended size: 100x100px or similar square/rectangular logo
+- If no logo is provided, the system will work without it
 
 ---
 
-#### 8️⃣ Start the Development Server
+#### 9️⃣ Build Frontend Assets
 
-**For Development (with Vite Hot Reload):**
-
-Open **two terminal windows**:
+Before running the application, you must build the CSS and JavaScript assets:
 
 ```bash
-# Terminal 1 - Start Vite development server
-npm run dev
-
-# Terminal 2 - Start Laravel server
-php artisan serve
-```
-
-**For Production:**
-
-```bash
-# Build optimized assets first
 npm run build
+```
 
-# Then start Laravel server
+This command:
+- Compiles all CSS and JavaScript files
+- Optimizes and minifies assets for production
+- Creates versioned files in `public/build/` directory
+- Should take about 30 seconds to complete
+
+**Important:** You must run this command at least once before starting the server, or assets won't load properly.
+
+---
+
+#### 🔟 Start the Laravel Development Server
+
+**Navigate to the project directory** (very important!):
+
+```bash
+# Make sure you're in the IPCR folder, not the parent folder
+cd C:\xampp\htdocs\IPCR  # Example for Windows
+# OR
+cd /path/to/IPCR  # Example for Linux/Mac
+```
+
+**Start the server:**
+
+```bash
 php artisan serve
 ```
 
-The application will be available at: **http://localhost:8000**
+**You should see:**
+```
+INFO  Server running on [http://127.0.0.1:8000].
+Press Ctrl+C to stop the server
+```
 
-**What each command does:**
-- `npm run dev` - Starts Vite with hot module replacement (auto-refreshes on file changes)
-- `npm run build` - Creates optimized production assets in `public/build/`
-- `php artisan serve` - Runs Laravel development server
+**Access the application:**
+- Open your browser and go to: **http://localhost:8000** or **http://127.0.0.1:8000**
+
+**Common Issues:**
+- **Error: "No such file or directory"** → Make sure you're in the project directory
+- **Port 8000 already in use** → Stop other Laravel servers or use a different port: `php artisan serve --port=8001`
+- **Assets not loading** → Make sure you ran `npm run build`
+
+---
+
+## 🔄 Running on Another Computer (Quick Setup Guide)
+
+If you're transferring this project to another computer:
+
+1. **Copy the entire project folder** to the new computer
+2. **Install prerequisites** (PHP, Composer, Node.js, MySQL)
+3. **Install dependencies:**
+   ```bash
+   composer install
+   npm install
+   ```
+4. **Copy and configure `.env` file:**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+5. **Create database** named `ipcr_system` in MySQL
+6. **Update `.env`** with your database credentials
+7. **Run migrations and seed:**
+   ```bash
+   php artisan migrate
+   php artisan db:seed
+   ```
+8. **Create storage link:**
+   ```bash
+   php artisan storage:link
+   ```
+9. **Build assets:**
+   ```bash
+   npm run build
+   ```
+10. **Start server:**
+    ```bash
+    php artisan serve
+    ```
+
+**That's it!** Access at http://localhost:8000
 
 ---
 
 ## 🎯 Usage
 
-### Login
+### First Time Login
 
-1. Go to http://localhost:8000
-2. Select your role (Admin, Director, Dean, or Faculty)
-3. Enter credentials:
-   - **Admin:** `admin` / `password123`
+1. **Start the server** (if not already running):
+   ```bash
+   php artisan serve
+   ```
 
-### Admin Panel
+2. **Open your browser** and go to: http://localhost:8000
+
+3. **Select role:** Click on "Admin" from the login selection page
+
+4. **Enter credentials:**
+   - **Username:** `admin`
+   - **Password:** `password`
+
+5. **You're in!** You'll be redirected to the admin dashboard
+
+### Admin Panel Features
 
 After logging in as admin, you can:
-- Manage users (Create, Edit, Delete)
-- Assign roles to users
-- Upload profile photos
-- Activate/Deactivate users
-- View user details
+
+**User Management:**
+- ✅ Create new users (Faculty, Dean, Director, or additional Admins)
+- ✅ Edit user information (except the main Administrator account)
+- ✅ Assign multiple roles to users
+- ✅ Upload profile photos for users
+- ✅ Activate/Deactivate user accounts
+- ✅ Delete users (except the main Administrator account)
+- ✅ View detailed user information
+- ✅ Filter users by department
+- ✅ Search users by name, email, or username
+
+**Dashboard:**
+- View total users count
+- View active/inactive users
+- View users by role (Admin, Director, Dean, Faculty)
+- Quick access to user management
+
+**Protected Administrator Account:**
+- The main admin account (URS26-ADM00001) is protected
+- Cannot be edited, deleted, or deactivated
+- Displayed with a 🔒 lock icon in the user list
+- Ensures system always has at least one administrator
 
 ### Faculty Dashboard
 
@@ -297,7 +418,23 @@ Faculty users can:
 - Access IPCR forms
 - Manage their profile
 - Change password
+- Update profile photo
 - View notifications
+
+### Creating Additional Users
+
+1. Go to **User Management**
+2. Click **"Create New User"**
+3. Fill in the form:
+   - Name, Email, Username
+   - Password (minimum 8 characters)
+   - Phone number (optional)
+   - Select one or more roles
+   - Select department (required for Faculty/Dean)
+   - Select designation
+   - Set active status
+4. Click **"Create User"**
+5. Employee ID will be auto-generated based on department
 
 ---
 
@@ -345,21 +482,48 @@ php artisan cache:clear
 ### Issue: Storage link not working
 
 ```bash
-# Remove old link
-rm public/storage
+# For Windows (Run PowerShell as Administrator)
+Remove-Item public/storage -Force -ErrorAction SilentlyContinue
+php artisan storage:link
 
-# Create new link
+# For Linux/Mac
+rm -f public/storage
 php artisan storage:link
 ```
 
 ### Issue: Migration errors
 
 ```bash
-# Rollback and re-migrate
+# Rollback and re-migrate (WARNING: This will delete all data)
 php artisan migrate:fresh
 
 # Then seed again
 php artisan db:seed
+```
+
+### Issue: "Class not found" errors
+
+```bash
+# Regenerate autoload files
+composer dump-autoload
+
+# Clear all caches
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+```
+
+### Issue: Assets (CSS/JS) not loading
+
+```bash
+# Rebuild assets
+npm run build
+
+# If that doesn't work, clear node_modules and reinstall
+rm -rf node_modules
+npm install
+npm run build
 ```
 
 ### Issue: Permission denied (Linux/Mac)
@@ -369,30 +533,101 @@ chmod -R 775 storage bootstrap/cache
 chown -R www-data:www-data storage bootstrap/cache
 ```
 
+### Issue: Cannot run php artisan serve
+
+**Problem:** Command not found or not running from correct directory
+
+**Solution:**
+1. Make sure you're in the project directory:
+   ```bash
+   cd C:\xampp\htdocs\IPCR  # Windows
+   cd /path/to/IPCR  # Linux/Mac
+   ```
+2. Verify you're in the right folder (should see artisan file):
+   ```bash
+   ls  # Linux/Mac
+   dir  # Windows
+   ```
+3. Check PHP is in PATH:
+   ```bash
+   php -v
+   ```
+
+### Issue: Port 8000 already in use
+
+```bash
+# Use a different port
+php artisan serve --port=8001
+
+# Or stop the existing server:
+# Press Ctrl+C in the terminal running the server
+```
+
+### Issue: Database connection error
+
+1. **Check XAMPP services:** Make sure MySQL is running in XAMPP Control Panel
+2. **Verify .env settings:** Check DB_DATABASE, DB_USERNAME, DB_PASSWORD
+3. **Test MySQL connection:**
+   ```bash
+   # For XAMPP on Windows
+   C:\xampp\mysql\bin\mysql.exe -u root
+   
+   # For Linux/Mac
+   mysql -u root
+   ```
+4. **Verify database exists:**
+   ```sql
+   SHOW DATABASES;
+   ```
+
+### Issue: "npm command not found"
+
+**Solution:** Install Node.js from https://nodejs.org/
+- Download LTS version
+- Install with default settings
+- Restart terminal/command prompt
+- Verify: `node -v` and `npm -v`
+
+### Issue: "composer command not found"
+
+**Solution:** Install Composer from https://getcomposer.org/download/
+- For Windows: Download and run Composer-Setup.exe
+- For Linux/Mac: Follow installation instructions on website
+- Restart terminal/command prompt
+- Verify: `composer -v`
+
 ---
 
 ## 🛠️ Development
 
 ### Running the Application
 
-**Development Mode (Recommended):**
+**Production Mode (Recommended for normal use):**
+```bash
+# Build optimized assets (only need to run once or after code changes)
+npm run build
+
+# Start Laravel development server
+php artisan serve
+```
+Access at: http://localhost:8000
+
+**Development Mode with Hot Reload (For developers making changes):**
+
+Open **two separate terminal windows**:
+
 ```bash
 # Terminal 1 - Vite dev server with hot reload
 npm run dev
 
 # Terminal 2 - Laravel development server
+cd C:\xampp\htdocs\IPCR  # Navigate to project folder first
 php artisan serve
 ```
-Access at: http://localhost:8000
 
-**Production Build:**
-```bash
-# Build optimized assets
-npm run build
-
-# Start server
-php artisan serve
-```
+**What's the difference?**
+- `npm run build` - Builds assets once, optimized and minified for production
+- `npm run dev` - Watches for file changes and auto-reloads browser (useful when editing CSS/JS)
 
 ### Running Tests
 
@@ -402,29 +637,72 @@ php artisan test
 
 ### Clearing Cache
 
+If you encounter strange behavior or old data showing up:
+
 ```bash
-php artisan cache:clear
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
+# Clear all caches at once
+php artisan optimize:clear
+
+# Or clear individually
+php artisan cache:clear      # Application cache
+php artisan config:clear     # Configuration cache
+php artisan route:clear      # Route cache
+php artisan view:clear       # Compiled views cache
 ```
 
 ### Asset Management with Vite
 
 ```bash
-# Development with hot module replacement
+# Development with hot module replacement (auto-refresh)
 npm run dev
 
 # Production build (optimized, minified, hashed)
 npm run build
+
+# Preview production build locally
+npm run preview
 ```
 
 **Vite Features:**
 - ⚡ Lightning-fast hot module replacement (HMR)
 - 📦 Optimized production builds with tree-shaking
-- 🔄 Auto-refresh browser on file changes
+- 🔄 Auto-refresh browser on file changes (with npm run dev)
 - 🎯 Cache-busting with content hashes
 - 📊 Build size analysis
+
+### Database Management
+
+**Reset database completely:**
+```bash
+php artisan migrate:fresh --seed
+```
+⚠️ **Warning:** This deletes ALL data and recreates tables with fresh seed data
+
+**Add new migration:**
+```bash
+php artisan make:migration create_something_table
+```
+
+**Rollback last migration:**
+```bash
+php artisan migrate:rollback
+```
+
+### Code Generation
+
+```bash
+# Create new controller
+php artisan make:controller NameController
+
+# Create new model
+php artisan make:model ModelName
+
+# Create model with migration
+php artisan make:model ModelName -m
+
+# Create new seeder
+php artisan make:seeder NameSeeder
+```
 
 ---
 

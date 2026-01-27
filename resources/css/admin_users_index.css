@@ -120,3 +120,15 @@
 .user-card-action-btn:hover {
     background: #f3f4f6;
 }
+
+/* Compact table styles */
+table {
+    table-layout: auto;
+}
+
+/* Truncate long text */
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

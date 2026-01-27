@@ -130,41 +130,41 @@
 
                 <!-- Desktop Table View (hidden on mobile) -->
                 <div class="hidden md:block bg-white rounded-lg shadow overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200">
+                    <table class="w-full divide-y divide-gray-200">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Photo</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider hidden md:table-cell">Employee ID</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider hidden lg:table-cell">Email</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Roles</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider hidden lg:table-cell">Department</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Actions</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase">Photo</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase hidden xl:table-cell">Employee ID</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase hidden xl:table-cell">Email</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase">Roles</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase hidden lg:table-cell">Dept</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200" id="usersTableBody">
                             @forelse($users as $user)
                                 <tr class="hover:bg-gray-50 user-row" data-name="{{ strtolower($user->name) }}" data-email="{{ strtolower($user->email) }}" data-username="{{ strtolower($user->username) }}" data-department="{{ $user->department_id ?? '' }}">
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-3 py-2 whitespace-nowrap">
                                         @if($user->hasProfilePhoto())
-                                            <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-10 h-10 rounded-full object-cover border-2 border-gray-300">
+                                            <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-8 h-8 rounded-full object-cover border border-gray-300">
                                         @else
-                                            <img src="/images/default_avatar.jpg" alt="{{ $user->name }}" class="w-10 h-10 rounded-full object-cover border-2 border-gray-300">
+                                            <img src="/images/default_avatar.jpg" alt="{{ $user->name }}" class="w-8 h-8 rounded-full object-cover border border-gray-300">
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                                    <td class="px-3 py-2 text-sm text-gray-900 font-medium max-w-[150px] truncate">
                                         {{ $user->name }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden md:table-cell">
+                                    <td class="px-3 py-2 text-xs text-gray-600 hidden xl:table-cell">
                                         {{ $user->employee_id ?? '-' }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden lg:table-cell">
+                                    <td class="px-3 py-2 text-xs text-gray-600 hidden xl:table-cell max-w-[180px] truncate">
                                         {{ $user->email }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <td class="px-3 py-2 text-sm">
                                         @foreach($user->roles() as $role)
-                                            <span class="px-2 py-1 rounded-full text-xs font-semibold mr-1
+                                            <span class="px-1.5 py-0.5 rounded text-xs font-semibold mr-1
                                                 @if($role === 'admin') bg-purple-100 text-purple-800
                                                 @elseif($role === 'director') bg-green-100 text-green-800
                                                 @elseif($role === 'dean') bg-blue-100 text-blue-800
@@ -175,38 +175,44 @@
                                             </span>
                                         @endforeach
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden lg:table-cell">
+                                    <td class="px-3 py-2 text-xs text-gray-600 hidden lg:table-cell max-w-[120px] truncate">
                                         {{ $user->department?->name ?? '-' }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <td class="px-3 py-2 text-sm">
                                         @if($user->is_active)
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Active</span>
+                                            <span class="px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-800">Active</span>
                                         @else
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">Inactive</span>
+                                            <span class="px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-800">Inactive</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2 flex items-center">
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm space-x-1 flex items-center">
                                         <a href="{{ route('admin.users.show', $user) }}" class="text-blue-600 hover:text-blue-900" title="View">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('admin.users.edit', $user) }}" class="text-green-600 hover:text-green-900" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        @if(auth()->user()->id !== $user->id)
-                                            <form method="POST" action="{{ route('admin.users.toggleActive', $user) }}" class="inline" style="margin: 0;">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit" class="text-orange-600 hover:text-orange-900" title="Toggle Active">
-                                                    <i class="fas fa-power-off"></i>
-                                                </button>
-                                            </form>
-                                            <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="inline deleteForm" style="margin: 0;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" onclick="openConfirmationModal('{{ $user->name }}', this.form)" class="text-red-600 hover:text-red-900" title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
+                                        @if($user->employee_id !== 'URS26-ADM00001')
+                                            <a href="{{ route('admin.users.edit', $user) }}" class="text-green-600 hover:text-green-900" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            @if(auth()->user()->id !== $user->id)
+                                                <form method="POST" action="{{ route('admin.users.toggleActive', $user) }}" class="inline" style="margin: 0;">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" class="text-orange-600 hover:text-orange-900" title="Toggle Active">
+                                                        <i class="fas fa-power-off"></i>
+                                                    </button>
+                                                </form>
+                                                <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="inline deleteForm" style="margin: 0;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button" onclick="openConfirmationModal('{{ $user->name }}', this.form)" class="text-red-600 hover:text-red-900" title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        @else
+                                            <span class="text-gray-400" title="Administrator account is protected">
+                                                <i class="fas fa-lock"></i>
+                                            </span>
                                         @endif
                                     </td>
                                 </tr>
@@ -259,17 +265,23 @@
                                 <a href="{{ route('admin.users.show', $user) }}" class="user-card-action-btn text-blue-600 hover:bg-blue-50" title="View">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="{{ route('admin.users.edit', $user) }}" class="user-card-action-btn text-green-600 hover:bg-green-50" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                @if(auth()->user()->id !== $user->id)
-                                    <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="inline deleteForm" style="margin: 0;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" onclick="openConfirmationModal('{{ $user->name }}', this.form)" class="user-card-action-btn text-red-600 hover:bg-red-50" title="Delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                @if($user->employee_id !== 'URS26-ADM00001')
+                                    <a href="{{ route('admin.users.edit', $user) }}" class="user-card-action-btn text-green-600 hover:bg-green-50" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    @if(auth()->user()->id !== $user->id)
+                                        <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="inline deleteForm" style="margin: 0;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" onclick="openConfirmationModal('{{ $user->name }}', this.form)" class="user-card-action-btn text-red-600 hover:bg-red-50" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                @else
+                                    <span class="user-card-action-btn text-gray-400" title="Administrator account is protected">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
                                 @endif
                             </div>
                         </div>

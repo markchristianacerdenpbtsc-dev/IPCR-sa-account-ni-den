@@ -95,6 +95,11 @@ class UserManagementController extends Controller
      */
     public function edit(User $user)
     {
+        // Prevent editing the main admin account
+        if ($user->employee_id === 'URS26-ADM00001') {
+            return redirect()->route('admin.users.index')->with('error', 'The administrator account cannot be edited');
+        }
+
         $roles = ['admin', 'director', 'dean', 'faculty'];
         $departments = Department::all();
         $designations = Designation::all();
@@ -107,6 +112,11 @@ class UserManagementController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        // Prevent updating the main admin account
+        if ($user->employee_id === 'URS26-ADM00001') {
+            return redirect()->route('admin.users.index')->with('error', 'The administrator account cannot be modified');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -177,6 +187,11 @@ class UserManagementController extends Controller
      */
     public function destroy(User $user)
     {
+        // Prevent deleting the main admin account
+        if ($user->employee_id === 'URS26-ADM00001') {
+            return redirect()->route('admin.users.index')->with('error', 'The administrator account cannot be deleted');
+        }
+
         // Prevent deleting self
         if (auth()->user()->id === $user->id) {
             return redirect()->route('admin.users.index')->with('error', 'You cannot delete your own account');
@@ -195,6 +210,11 @@ class UserManagementController extends Controller
      */
     public function toggleActive(User $user)
     {
+        // Prevent toggling the main admin account
+        if ($user->employee_id === 'URS26-ADM00001') {
+            return redirect()->route('admin.users.index')->with('error', 'The administrator account status cannot be changed');
+        }
+
         if (auth()->user()->id === $user->id) {
             return redirect()->route('admin.users.index')->with('error', 'You cannot toggle your own status');
         }
