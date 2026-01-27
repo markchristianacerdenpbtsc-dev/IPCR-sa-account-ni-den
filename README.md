@@ -18,11 +18,20 @@ A comprehensive Individual Performance Commitment and Review (IPCR) management s
 
 ## 📦 Latest Updates (January 27, 2026)
 
+### Photo Management Enhancements
+- 📸 **Automatic Image Compression** - All uploaded photos are automatically compressed to reduce file size
+- 🖼️ **Smart Resizing** - Images larger than 1200px are automatically resized while maintaining aspect ratio
+- 🎯 **Quality Optimization** - JPEG/WebP files compressed to 80% quality for perfect balance
+- 👤 **Default Avatar System** - Users without photos get clean SVG silhouette avatars
+- 🎨 **Styled Modals** - Consistent confirmation modals for deleting and setting profile photos
+- ⚡ **Hover Controls** - Intuitive photo management with hover-triggered controls
+
 ### Admin Protection & UI Improvements
 - 🔒 **Protected Administrator Account** - Main admin account (URS26-ADM00001) cannot be edited, deleted, or deactivated
 - 🎨 **Compact Table Design** - User management table redesigned with reduced padding and spacing
 - 📊 **No Department for Admin** - Administrator account has no department/designation assignment
 - 🔐 **Lock Icon Indicator** - Admin account displays lock icon instead of edit/delete buttons
+- 🔄 **Login Route Fix** - Added GET /login route that redirects to role selection
 
 ### Database Seeding Update
 - ✅ **Simplified UserSeeder** - Now creates only the admin user (previously created 8 sample users)
@@ -72,7 +81,7 @@ A comprehensive Individual Performance Commitment and Review (IPCR) management s
 ### Prerequisites
 
 Make sure you have the following installed on your computer:
-- **PHP >= 8.1** - [Download PHP](https://www.php.net/downloads)
+- **PHP >= 8.1** with **GD Extension enabled** - [Download PHP](https://www.php.net/downloads)
 - **Composer** - [Download Composer](https://getcomposer.org/download/)
 - **MySQL/MariaDB** - Database server
 - **Node.js & NPM** (v16 or higher) - [Download Node.js](https://nodejs.org/)
@@ -80,6 +89,12 @@ Make sure you have the following installed on your computer:
   - Includes PHP, MySQL, and Apache in one package
 
 **Note:** If using XAMPP, make sure Apache and MySQL services are running before proceeding.
+
+**Important for Image Uploads:**
+The system requires the PHP GD extension for image compression and resizing. If using XAMPP:
+1. Open `C:\xampp\php\php.ini` in a text editor (as Administrator)
+2. Find `;extension=gd` and remove the semicolon to make it `extension=gd`
+3. Save the file and restart Apache in XAMPP Control Panel
 
 ---
 
@@ -329,39 +344,124 @@ Press Ctrl+C to stop the server
 
 If you're transferring this project to another computer:
 
-1. **Copy the entire project folder** to the new computer
-2. **Install prerequisites** (PHP, Composer, Node.js, MySQL)
-3. **Install dependencies:**
-   ```bash
-   composer install
-   npm install
-   ```
-4. **Copy and configure `.env` file:**
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
-5. **Create database** named `ipcr_system` in MySQL
-6. **Update `.env`** with your database credentials
-7. **Run migrations and seed:**
-   ```bash
-   php artisan migrate
-   php artisan db:seed
-   ```
-8. **Create storage link:**
-   ```bash
-   php artisan storage:link
-   ```
-9. **Build assets:**
-   ```bash
-   npm run build
-   ```
-10. **Start server:**
-    ```bash
-    php artisan serve
-    ```
+### 1. Copy Files
+- Copy the entire project folder to the new computer
+- **Or** clone from GitHub: `git clone https://github.com/jarlokenpaghubasan/IPCR.git`
 
-**That's it!** Access at http://localhost:8000
+### 2. Install Prerequisites
+- Install PHP >= 8.1, Composer, Node.js, and MySQL
+- **For XAMPP users on Windows:**
+  1. Download and install XAMPP
+  2. Open `C:\xampp\php\php.ini` in a text editor (Run as Administrator)
+  3. Find `;extension=gd` and change it to `extension=gd` (remove the semicolon)
+  4. Save and restart Apache in XAMPP Control Panel
+  5. Verify GD is enabled: `php -m | findstr GD`
+
+### 3. Install Dependencies
+```bash
+cd IPCR  # Navigate to project folder
+composer install
+npm install
+```
+
+### 4. Environment Setup
+```bash
+# For Windows (PowerShell)
+Copy-Item .env.example .env
+
+# For Linux/Mac
+cp .env.example .env
+
+# Generate application key
+php artisan key:generate
+```
+
+### 5. Configure Database
+Edit `.env` file and update these values:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=ipcr_system
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 6. Create Database
+**Using phpMyAdmin (XAMPP users):**
+- Open http://localhost/phpmyadmin
+- Click "New" → Create database named `ipcr_system`
+- Collation: `utf8mb4_unicode_ci`
+
+**Or using command line:**
+```bash
+# Windows XAMPP
+C:\xampp\mysql\bin\mysql.exe -u root -e "CREATE DATABASE ipcr_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+# Linux/Mac
+mysql -u root -e "CREATE DATABASE ipcr_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+```
+
+### 7. Run Migrations & Seed Data
+```bash
+php artisan migrate
+php artisan db:seed
+```
+
+This creates:
+- All database tables
+- 3 Departments (COA, COB, CCS)
+- 4 Designations (Professor levels)
+- 1 Admin user (username: `admin`, password: `password`)
+
+### 8. Setup Storage
+```bash
+# Run as Administrator on Windows
+php artisan storage:link
+```
+
+### 9. Build Frontend Assets
+```bash
+npm run build
+```
+
+This compiles and optimizes all CSS/JS files. **Must be done before starting the server!**
+
+### 10. Start the Server
+```bash
+php artisan serve
+```
+
+Access at: **http://localhost:8000**
+
+**Login with:**
+- Username: `admin`
+- Password: `password`
+
+---
+
+### Troubleshooting Common Issues
+
+**"GD extension not found" error when uploading photos:**
+- Enable GD in `php.ini` (see step 2 above)
+- Restart Apache
+- Verify: `php -m | findstr GD` (Windows) or `php -m | grep GD` (Linux/Mac)
+
+**Assets not loading (blank page):**
+- Make sure you ran `npm run build`
+- Check that `public/build/` folder exists
+
+**Port 8000 already in use:**
+- Use different port: `php artisan serve --port=8001`
+
+**Storage link error on Windows:**
+- Run PowerShell/CMD as Administrator
+- Or manually create: `mkdir storage\app\public\user_photos`
+
+**Database connection error:**
+- Verify MySQL is running in XAMPP
+- Check `.env` database credentials
+- Ensure database `ipcr_system` exists
 
 ---
 

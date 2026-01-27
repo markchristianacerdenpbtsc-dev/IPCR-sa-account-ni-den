@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\UserPhoto;
 use Illuminate\Support\Facades\Log;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class PhotoService
 {
@@ -31,7 +33,26 @@ class PhotoService
             $filePath = "{$userPhotoDir}/{$filename}";
             $fullPath = storage_path("app/public/{$filePath}");
 
-            $file->move(dirname($fullPath), basename($fullPath));
+            // Compress and resize image using Intervention Image
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($file);
+            
+            // Resize if larger than 1200px on either dimension (maintains aspect ratio)
+            if ($image->width() > 1200 || $image->height() > 1200) {
+                $image->scale(width: 1200, height: 1200);
+            }
+            
+            // Save with compression based on file type
+            if (in_array($extension, ['jpg', 'jpeg'])) {
+                $image->toJpeg(quality: 80)->save($fullPath);
+            } elseif ($extension === 'png') {
+                $image->toPng()->save($fullPath);
+            } elseif ($extension === 'webp') {
+                $image->toWebp(quality: 80)->save($fullPath);
+            } else {
+                // Fallback for other formats (e.g., gif)
+                $file->move(dirname($fullPath), basename($fullPath));
+            }
 
             if (!file_exists($fullPath)) {
                 throw new \Exception('File upload failed');

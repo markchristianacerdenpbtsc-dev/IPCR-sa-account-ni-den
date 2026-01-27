@@ -98,13 +98,7 @@
                             <p class="text-gray-900 font-semibold text-sm">{{ auth()->user()->name }}</p>
                             <p class="text-gray-600 text-xs">Admin</p>
                         </div>
-                        @if(auth()->user()->hasProfilePhoto())
-                            <img src="{{ auth()->user()->profile_photo_url }}" alt="{{ auth()->user()->name }}" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover flex-shrink-0">
-                        @else
-                            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-500 flex items-center justify-center border-2 border-blue-600 flex-shrink-0">
-                                <i class="fas fa-user text-white text-xs"></i>
-                            </div>
-                        @endif
+                        <img src="{{ auth()->user()->profile_photo_url }}" alt="{{ auth()->user()->name }}" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover flex-shrink-0">
                     </div>
                 </div>
             </div>

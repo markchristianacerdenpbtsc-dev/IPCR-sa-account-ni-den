@@ -62,13 +62,7 @@
                             <p class="text-gray-900 font-semibold text-sm">{{ auth()->user()->name }}</p>
                             <p class="text-gray-600 text-xs">Admin</p>
                         </div>
-                        @if(auth()->user()->hasProfilePhoto())
-                            <img src="{{ auth()->user()->profile_photo_url }}" alt="{{ auth()->user()->name }}" class="w-10 h-10 rounded-full object-cover">
-                        @else
-                            <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center border-2 border-blue-600">
-                                <i class="fas fa-user text-white text-xs"></i>
-                            </div>
-                        @endif
+                        <img src="{{ auth()->user()->profile_photo_url }}" alt="{{ auth()->user()->name }}" class="w-10 h-10 rounded-full object-cover">
                     </div>
                 </div>
             </div>
@@ -296,6 +290,63 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Set as Profile Confirmation Modal -->
+    <div id="setProfileModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full animate-scale-in">
+            <div class="bg-blue-50 border-b border-blue-200 px-6 py-4 flex items-center gap-3">
+                <div class="bg-blue-100 rounded-full p-3">
+                    <i class="fas fa-check-circle text-blue-600 text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900">Set as Profile Picture</h2>
+                    <p class="text-sm text-gray-600">Update your profile photo</p>
+                </div>
+            </div>
+
+            <div class="px-6 py-4">
+                <p class="text-gray-700 text-sm">Set this photo as your profile picture?</p>
+            </div>
+
+            <div class="bg-gray-50 border-t border-gray-200 px-6 py-4 flex gap-3 justify-end">
+                <button type="button" onclick="closeSetProfileModal()" class="px-4 py-2 rounded-lg font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition text-sm">
+                    Cancel
+                </button>
+                <button type="button" onclick="confirmSetProfile()" class="px-4 py-2 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition flex items-center gap-2 text-sm">
+                    <i class="fas fa-check"></i> Set as Profile
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Photo Confirmation Modal -->
+    <div id="deletePhotoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full animate-scale-in">
+            <div class="bg-red-50 border-b border-red-200 px-6 py-4 flex items-center gap-3">
+                <div class="bg-red-100 rounded-full p-3">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900">Confirm Delete</h2>
+                    <p class="text-sm text-gray-600">This action cannot be undone</p>
+                </div>
+            </div>
+
+            <div class="px-6 py-4">
+                <p class="text-gray-700 mb-2 text-sm">Are you sure you want to delete this photo?</p>
+                <p class="text-sm text-gray-600">The photo will be permanently removed from the system.</p>
+            </div>
+
+            <div class="bg-gray-50 border-t border-gray-200 px-6 py-4 flex gap-3 justify-end">
+                <button type="button" onclick="closeDeletePhotoModal()" class="px-4 py-2 rounded-lg font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition text-sm">
+                    Cancel
+                </button>
+                <button type="button" onclick="confirmDeletePhoto()" class="px-4 py-2 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-700 transition flex items-center gap-2 text-sm">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
             </div>
         </div>
     </div>

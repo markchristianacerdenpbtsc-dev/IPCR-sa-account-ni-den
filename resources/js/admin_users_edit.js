@@ -106,19 +106,102 @@ function loadPhotos() {
             allPhotos.innerHTML = data.photos.map(photo => `
                 <div class="relative group">
                     <img src="${photo.url}" alt="Photo" class="w-full aspect-square object-cover rounded-lg">
-                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 rounded-lg transition flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                        ${!photo.is_profile ? `<a href="/admin/panel/users/${userId}/photos/${photo.id}/set-profile" class="bg-white text-blue-600 p-1.5 rounded text-xs hover:bg-blue-50" title="Set as profile"><i class="fas fa-star"></i></a>` : '<span class="bg-blue-500 text-white px-2 py-1 rounded text-xs font-semibold">Profile</span>'}
-                        <form method="POST" action="/admin/panel/users/${userId}/photos/${photo.id}" class="inline" style="margin: 0;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="bg-red-600 text-white p-1.5 rounded text-xs hover:bg-red-700" title="Delete" onclick="return confirm('Delete this photo?')"><i class="fas fa-trash"></i></button>
-                        </form>
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 rounded-lg transition flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                        ${!photo.is_profile ? `
+                            <button onclick="setAsProfile(${photo.id})" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg text-xs transition" title="Set as profile">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        ` : ''}
+                        <button onclick="deletePhoto(${photo.id}, '${photo.url}')" class="text-red-600 hover:text-red-900 bg-white p-2 rounded-lg transition" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
                     ${photo.is_profile ? '<span class="absolute top-1 right-1 bg-blue-500 text-white px-2 py-1 rounded text-xs font-semibold"><i class="fas fa-check"></i></span>' : ''}
                 </div>
             `).join('');
         });
 }
+
+let pendingPhotoId = null;
+let pendingProfilePhotoId = null;
+
+// Set photo as profile - open modal
+window.setAsProfile = function(photoId) {
+    pendingProfilePhotoId = photoId;
+    document.getElementById('setProfileModal').classList.remove('hidden');
+};
+
+// Close set profile modal
+window.closeSetProfileModal = function() {
+    document.getElementById('setProfileModal').classList.add('hidden');
+    pendingProfilePhotoId = null;
+};
+
+// Confirm set as profile
+window.confirmSetProfile = function() {
+    if (pendingProfilePhotoId) {
+        fetch(`/admin/panel/users/${userId}/photos/${pendingProfilePhotoId}/set-profile`, {
+            method: 'PATCH',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            closeSetProfileModal();
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert(data.message || 'Failed to set as profile');
+            }
+        })
+        .catch(error => {
+            closeSetProfileModal();
+            console.error('Error:', error);
+            alert('Failed to set as profile');
+        });
+    }
+};
+
+// Delete photo - open modal
+window.deletePhoto = function(photoId, photoUrl) {
+    pendingPhotoId = photoId;
+    document.getElementById('deletePhotoModal').classList.remove('hidden');
+};
+
+// Close delete photo modal
+window.closeDeletePhotoModal = function() {
+    document.getElementById('deletePhotoModal').classList.add('hidden');
+    pendingPhotoId = null;
+};
+
+// Confirm delete photo
+window.confirmDeletePhoto = function() {
+    if (pendingPhotoId) {
+        fetch(`/admin/panel/users/${userId}/photos/${pendingPhotoId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            closeDeletePhotoModal();
+            if (data.success) {
+                loadPhotos();
+            } else {
+                alert(data.message || 'Failed to delete photo');
+            }
+        })
+        .catch(error => {
+            closeDeletePhotoModal();
+            console.error('Error:', error);
+            alert('Failed to delete photo');
+        });
+    }
+};
 
 // Load photos on page load
 loadPhotos();

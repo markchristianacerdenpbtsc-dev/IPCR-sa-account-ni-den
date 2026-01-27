@@ -19,6 +19,10 @@ Route::get('/', [LoginController::class, 'showLoginSelection'])
     ->name('login.selection')
     ->middleware('guest');
 
+Route::get('/login', function () {
+    return redirect()->route('login.selection');
+})->middleware('guest');
+
 Route::get('/login/{role}', [LoginController::class, 'showLoginForm'])
     ->name('login.form')
     ->middleware('guest');

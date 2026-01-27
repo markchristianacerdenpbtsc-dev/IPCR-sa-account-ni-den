@@ -62,13 +62,7 @@
                             <p class="text-gray-900 font-semibold text-sm">{{ auth()->user()->name }}</p>
                             <p class="text-gray-600 text-xs">Admin</p>
                         </div>
-                        @if(auth()->user()->hasProfilePhoto())
-                            <img src="{{ auth()->user()->profile_photo_url }}" alt="{{ auth()->user()->name }}" class="w-10 h-10 rounded-full object-cover">
-                        @else
-                            <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center border-2 border-blue-600">
-                                <i class="fas fa-user text-white text-xs"></i>
-                            </div>
-                        @endif
+                        <img src="{{ auth()->user()->profile_photo_url }}" alt="{{ auth()->user()->name }}" class="w-10 h-10 rounded-full object-cover">
                     </div>
                 </div>
             </div>
@@ -147,11 +141,7 @@
                             @forelse($users as $user)
                                 <tr class="hover:bg-gray-50 user-row" data-name="{{ strtolower($user->name) }}" data-email="{{ strtolower($user->email) }}" data-username="{{ strtolower($user->username) }}" data-department="{{ $user->department_id ?? '' }}">
                                     <td class="px-3 py-2 whitespace-nowrap">
-                                        @if($user->hasProfilePhoto())
-                                            <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-8 h-8 rounded-full object-cover border border-gray-300">
-                                        @else
-                                            <img src="/images/default_avatar.jpg" alt="{{ $user->name }}" class="w-8 h-8 rounded-full object-cover border border-gray-300">
-                                        @endif
+                                        <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-8 h-8 rounded-full object-cover border border-gray-300">
                                     </td>
                                     <td class="px-3 py-2 text-sm text-gray-900 font-medium max-w-[150px] truncate">
                                         {{ $user->name }}
@@ -232,11 +222,7 @@
                     @forelse($users as $user)
                         <div class="user-card user-row" data-name="{{ strtolower($user->name) }}" data-email="{{ strtolower($user->email) }}" data-username="{{ strtolower($user->username) }}" data-department="{{ $user->department_id ?? '' }}">
                             <img 
-                                @if($user->hasProfilePhoto())
-                                    src="{{ $user->profile_photo_url }}"
-                                @else
-                                    src="/images/default_avatar.jpg"
-                                @endif
+                                src="{{ $user->profile_photo_url }}"
                                 alt="{{ $user->name }}" 
                                 class="user-card-photo"
                             >
