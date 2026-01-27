@@ -74,6 +74,19 @@ A comprehensive Individual Performance Commitment and Review (IPCR) management s
 - 🔧 **@vite directive** - All blade files now use Laravel Vite plugin
 - 🔧 **Build optimization** - Assets reduced from ~200KB to gzipped builds
 
+### UI/UX Enhancements
+- 🎨 **Split-Screen Login Design** - Modern login page with title on left, form on right
+- 🌊 **Fixed Blob Animations** - Eliminated visual artifacts during scrolling
+- 📱 **Mobile Scrolling Fix** - Proper overflow handling for mobile devices
+- 🎯 **Responsive Layout** - Optimized for all screen sizes (mobile, tablet, desktop)
+
+### Developer Experience
+- 🔧 **Laravel Blade Snippets** - Recommended VS Code extension for better IDE support
+  - Install: "Laravel Blade Snippets" by Winnie Lin
+  - Eliminates false route() parameter warnings
+  - Provides autocomplete for Blade directives
+  - Improves syntax highlighting
+
 ---
 
 ## 🚀 Installation & Setup
