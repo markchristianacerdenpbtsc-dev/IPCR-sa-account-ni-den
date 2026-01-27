@@ -4,15 +4,15 @@ nixPkgs = ['php82', 'php82Packages.composer', 'nodejs_20']
 [phases.install]
 cmds = [
   'composer install --optimize-autoloader --no-dev',
-  'npm ci'
+  'npm install'
 ]
 
 [phases.build]
 cmds = [
   'npm run build',
-  'php artisan config:clear',
-  'php artisan view:clear'
+  'ls -la public/build || echo "Build directory not found"',
+  'cat public/build/manifest.json || echo "Manifest not found"'
 ]
 
 [start]
-cmd = 'php artisan storage:link; php artisan serve --host=0.0.0.0 --port=$PORT'
+cmd = 'php artisan storage:link 2>/dev/null || true; php artisan serve --host=0.0.0.0 --port=$PORT'
