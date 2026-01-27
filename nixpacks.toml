@@ -7,7 +7,11 @@ cmds = [
 ]
 
 [phases.build]
-cmds = ['echo "Using pre-built assets"']
+cmds = [
+  'echo "Using pre-built assets"',
+  'mkdir -p storage/app/public/user_photos',
+  'chmod -R 775 storage'
+]
 
 [start]
-cmd = 'php artisan storage:link 2>/dev/null || true; php artisan serve --host=0.0.0.0 --port=$PORT'
+cmd = 'rm -f public/storage; php artisan storage:link; php artisan serve --host=0.0.0.0 --port=$PORT'
