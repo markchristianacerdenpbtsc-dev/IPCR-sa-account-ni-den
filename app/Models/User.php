@@ -157,19 +157,31 @@ class User extends Authenticatable
     }
 
     /**
+     * Get IPCR templates for this user
+     */
+    public function ipcrTemplates()
+    {
+        return $this->hasMany(IpcrTemplate::class);
+    }
+
+    /**
      * Get profile photo URL
      */
     public function getProfilePhotoUrlAttribute()
     {
         try {
+            // Use fresh query to avoid caching issues
             $profilePhoto = UserPhoto::where('user_id', $this->id)
                 ->where('is_profile_photo', true)
+                ->latest('updated_at')
                 ->first();
             
             if ($profilePhoto && $profilePhoto->path) {
                 $fullPath = storage_path("app/public/{$profilePhoto->path}");
                 if (file_exists($fullPath)) {
-                    return asset("storage/{$profilePhoto->path}");
+                    // Add a cache-busting parameter using the updated_at timestamp
+                    $timestamp = $profilePhoto->updated_at->timestamp;
+                    return asset("storage/{$profilePhoto->path}?v={$timestamp}");
                 }
             }
         } catch (\Exception $e) {
@@ -186,8 +198,10 @@ class User extends Authenticatable
     public function hasProfilePhoto()
     {
         try {
+            // Use fresh query to avoid caching issues
             $profilePhoto = UserPhoto::where('user_id', $this->id)
                 ->where('is_profile_photo', true)
+                ->latest('updated_at')
                 ->first();
             
             if ($profilePhoto && $profilePhoto->path) {

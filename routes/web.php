@@ -7,6 +7,7 @@ use App\Http\Controllers\Dashboard\DirectorDashboardController;
 use App\Http\Controllers\Dashboard\AdminDashboardController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\PhotoController;
+use App\Http\Controllers\Faculty\IpcrTemplateController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -56,6 +57,20 @@ Route::get('/faculty/profile', [FacultyDashboardController::class, 'profile'])
 
 Route::patch('/faculty/password/change', [FacultyDashboardController::class, 'changePassword'])
     ->name('faculty.password.change')
+    ->middleware(['auth', 'role:faculty']);
+
+// IPCR Template Routes
+Route::post('/faculty/ipcr/store', [IpcrTemplateController::class, 'store'])
+    ->name('faculty.ipcr.store')
+    ->middleware(['auth', 'role:faculty']);
+
+Route::get('/faculty/ipcr/templates/{id}', [IpcrTemplateController::class, 'show'])
+    ->middleware(['auth', 'role:faculty']);
+
+Route::delete('/faculty/ipcr/templates/{id}', [IpcrTemplateController::class, 'destroy'])
+    ->middleware(['auth', 'role:faculty']);
+
+Route::put('/faculty/ipcr/templates/{id}', [IpcrTemplateController::class, 'update'])
     ->middleware(['auth', 'role:faculty']);
 
 

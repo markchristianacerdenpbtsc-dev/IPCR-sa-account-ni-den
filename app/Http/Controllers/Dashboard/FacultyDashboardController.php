@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Models\IpcrTemplate;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Hash;
@@ -17,7 +18,11 @@ class FacultyDashboardController extends Controller
 
     public function myIpcrs(): View
     {
-        return view('dashboard.faculty.my-ipcrs');
+        $templates = IpcrTemplate::where('user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return view('dashboard.faculty.my-ipcrs', compact('templates'));
     }
 
     public function profile(): View

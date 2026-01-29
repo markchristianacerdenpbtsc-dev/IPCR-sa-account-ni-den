@@ -122,11 +122,17 @@ class PhotoService
     public function setAsProfilePhoto(UserPhoto $photo)
     {
         try {
+            // First, unset all other photos as profile
             UserPhoto::where('user_id', $photo->user_id)
                 ->where('is_profile_photo', true)
                 ->update(['is_profile_photo' => false]);
 
-            $photo->update(['is_profile_photo' => true]);
+            // Then set the selected photo as profile
+            // Touch the photo to update its timestamp (for cache busting)
+            $photo->update([
+                'is_profile_photo' => true,
+                'updated_at' => now(),
+            ]);
         } catch (\Exception $e) {
             Log::error('Set profile photo error: ' . $e->getMessage());
             throw new \Exception('Failed to set profile photo: ' . $e->getMessage());
