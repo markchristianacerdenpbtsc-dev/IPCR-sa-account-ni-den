@@ -62,16 +62,35 @@
 }
 .notification-popup {
     display: none;
-    position: absolute;
-    top: calc(100% + 10px);
-    right: 0;
+    position: fixed;
+    top: auto;
+    left: auto;
+    right: 10px;
     width: 320px;
-    max-width: 90vw;
+    max-width: calc(100vw - 20px);
     background: white;
     border-radius: 12px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     z-index: 1000;
 }
+
+@media (min-width: 641px) {
+    .notification-popup {
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        width: 320px;
+        max-width: 90vw;
+    }
+}
+
+@media (max-width: 640px) {
+    .notification-popup {
+        top: 60px;
+        width: 280px;
+    }
+}
+
 .notification-popup.active {
     display: block;
     animation: slideDown 0.2s ease-out;

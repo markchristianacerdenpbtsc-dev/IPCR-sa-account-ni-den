@@ -45,7 +45,7 @@
     ]
   },
   "resources/css/dashboard_admin_index.css": {
-    "file": "assets/dashboard_admin_index-CoXboxMO.css",
+    "file": "assets/dashboard_admin_index-B54pyw2M.css",
     "src": "resources/css/dashboard_admin_index.css",
     "isEntry": true,
     "name": "dashboard_admin_index",
@@ -54,7 +54,7 @@
     ]
   },
   "resources/css/dashboard_faculty_index.css": {
-    "file": "assets/dashboard_faculty_index-DpaKM9mm.css",
+    "file": "assets/dashboard_faculty_index-VbUmN1Cs.css",
     "src": "resources/css/dashboard_faculty_index.css",
     "isEntry": true,
     "name": "dashboard_faculty_index",
@@ -63,7 +63,7 @@
     ]
   },
   "resources/css/dashboard_faculty_my-ipcrs.css": {
-    "file": "assets/dashboard_faculty_my-ipcrs-BomxqTyW.css",
+    "file": "assets/dashboard_faculty_my-ipcrs-OD5N6b1A.css",
     "src": "resources/css/dashboard_faculty_my-ipcrs.css",
     "isEntry": true,
     "name": "dashboard_faculty_my-ipcrs",
@@ -72,7 +72,7 @@
     ]
   },
   "resources/css/dashboard_faculty_profile.css": {
-    "file": "assets/dashboard_faculty_profile-C8z9uox8.css",
+    "file": "assets/dashboard_faculty_profile-BY-oIMIE.css",
     "src": "resources/css/dashboard_faculty_profile.css",
     "isEntry": true,
     "name": "dashboard_faculty_profile",

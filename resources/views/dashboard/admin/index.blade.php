@@ -11,22 +11,27 @@
 </head>
 <body class="bg-gray-50">
     <div class="flex min-h-screen">
-        <!-- Sidebar -->
-        <aside class="hidden lg:flex lg:w-64 bg-white border-r flex-col">
-            <div class="px-6 py-6 border-b">
+        <!-- Desktop Sidebar (hidden on mobile) -->
+        <div class="w-64 bg-white shadow-lg hidden lg:block">
+            <div class="p-6 border-b">
                 <h1 class="text-xl font-bold text-gray-900">Admin Panel</h1>
-                <p class="text-sm text-gray-500">IPCR/OPCR Module</p>
+                <p class="text-sm text-gray-600">IPCR/OPCR Module</p>
             </div>
-            <nav class="px-4 py-6 space-y-2">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-700 font-semibold">
+
+            <nav class="p-6 space-y-2">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600 font-semibold">
                     <i class="fas fa-home w-5"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition">
+
+                <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
                     <i class="fas fa-users w-5"></i>
                     <span>User Management</span>
                 </a>
-                <form method="POST" action="{{ route('logout') }}" class="pt-4">
+
+                <hr class="my-4">
+
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
                     @csrf
                     <button type="submit" class="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition w-full">
                         <i class="fas fa-sign-out-alt w-5"></i>
@@ -34,22 +39,67 @@
                     </button>
                 </form>
             </nav>
-        </aside>
+        </div>
+
+        <!-- Mobile Sidebar Overlay -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 opacity-0 pointer-events-none lg:hidden"></div>
+
+        <!-- Mobile Sidebar -->
+        <div id="sidebar" class="fixed lg:hidden inset-y-0 left-0 w-64 bg-white shadow-lg z-40 -translate-x-full">
+            <div class="p-6 border-b flex justify-between items-center">
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">Admin Panel</h1>
+                    <p class="text-sm text-gray-600">IPCR/OPCR Module</p>
+                </div>
+                <button onclick="toggleSidebar()" class="p-2 hover:bg-gray-100 rounded-lg">
+                    <i class="fas fa-times text-gray-700 text-xl"></i>
+                </button>
+            </div>
+
+            <nav class="p-6 space-y-2">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600 font-semibold">
+                    <i class="fas fa-home w-5"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                    <i class="fas fa-users w-5"></i>
+                    <span>User Management</span>
+                </a>
+
+                <hr class="my-4">
+
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    @csrf
+                    <button type="submit" class="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition w-full">
+                        <i class="fas fa-sign-out-alt w-5"></i>
+                        <span>Logout</span>
+                    </button>
+                </form>
+            </nav>
+        </div>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col">
-            <header class="bg-white border-b">
-                <div class="px-6 sm:px-8 py-5 flex items-center justify-between">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-900">Administrator Dashboard</h2>
-                        <p class="text-sm text-gray-500">IPCR and OPCR Management System</p>
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="bg-white shadow">
+                <div class="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex justify-between items-center gap-3 sm:gap-4">
+                    <!-- Hamburger (mobile/tablet only) -->
+                    <button id="hamburgerBtn" onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 flex-shrink-0">
+                        <i class="fas fa-bars text-gray-700 text-xl"></i>
+                    </button>
+
+                    <div class="flex-1 min-w-0">
+                        <h2 class="text-lg sm:text-xl font-bold text-gray-900">Administrator Dashboard</h2>
+                        <p class="text-gray-600 text-xs sm:text-sm">IPCR and OPCR Management System</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <div class="text-right">
-                            <p class="text-sm font-semibold text-gray-900">{{ auth()->user()->name }}</p>
-                            <p class="text-xs text-gray-500">Administrator</p>
+
+                    <div class="flex items-center gap-2 sm:gap-3 text-right whitespace-nowrap hidden sm:flex flex-shrink-0">
+                        <div class="text-right hidden md:block">
+                            <p class="text-gray-900 font-semibold text-sm">{{ auth()->user()->name }}</p>
+                            <p class="text-gray-600 text-xs">Admin</p>
                         </div>
-                        <img src="{{ auth()->user()->profile_photo_url }}" alt="{{ auth()->user()->name }}" class="w-10 h-10 rounded-full object-cover">
+                        <img src="{{ auth()->user()->profile_photo_url }}" alt="{{ auth()->user()->name }}" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover flex-shrink-0">
                     </div>
                 </div>
             </header>
@@ -183,5 +233,19 @@
             </main>
         </div>
     </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('opacity-0');
+            overlay.classList.toggle('pointer-events-none');
+        }
+
+        // Close sidebar when clicking overlay
+        document.getElementById('sidebarOverlay').addEventListener('click', toggleSidebar);
+    </script>
 </body>
 </html>
