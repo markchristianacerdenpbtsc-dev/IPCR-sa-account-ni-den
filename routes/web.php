@@ -8,6 +8,7 @@ use App\Http\Controllers\Dashboard\AdminDashboardController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\PhotoController;
 use App\Http\Controllers\Faculty\IpcrTemplateController;
+use App\Http\Controllers\Faculty\IpcrSubmissionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -71,6 +72,11 @@ Route::delete('/faculty/ipcr/templates/{id}', [IpcrTemplateController::class, 'd
     ->middleware(['auth', 'role:faculty']);
 
 Route::put('/faculty/ipcr/templates/{id}', [IpcrTemplateController::class, 'update'])
+    ->middleware(['auth', 'role:faculty']);
+
+// IPCR Submission Routes
+Route::post('/faculty/ipcr/submissions', [IpcrSubmissionController::class, 'store'])
+    ->name('faculty.ipcr.submissions.store')
     ->middleware(['auth', 'role:faculty']);
 
 

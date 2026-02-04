@@ -8,17 +8,34 @@ use Cloudinary\Cloudinary;
 
 class PhotoService
 {
-    protected $cloudinary;
+    protected ?Cloudinary $cloudinary = null;
 
     public function __construct()
     {
-        $this->cloudinary = new Cloudinary([
-            'cloud' => [
-                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                'api_key' => env('CLOUDINARY_API_KEY'),
-                'api_secret' => env('CLOUDINARY_API_SECRET'),
-            ],
-        ]);
+        $cloudName = env('CLOUDINARY_CLOUD_NAME');
+        $apiKey = env('CLOUDINARY_API_KEY');
+        $apiSecret = env('CLOUDINARY_API_SECRET');
+
+        if ($cloudName && $apiKey && $apiSecret) {
+            $this->cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => $cloudName,
+                    'api_key' => $apiKey,
+                    'api_secret' => $apiSecret,
+                ],
+            ]);
+        } else {
+            Log::warning('Cloudinary is not configured. Photo features will be disabled.');
+        }
+    }
+
+    protected function ensureCloudinary(): Cloudinary
+    {
+        if (!$this->cloudinary) {
+            throw new \Exception('Cloudinary is not configured.');
+        }
+
+        return $this->cloudinary;
     }
 
     public function uploadPhoto($file, $user)
@@ -33,7 +50,7 @@ class PhotoService
             $publicId = "user_photos/{$user->id}/{$timestamp}-{$username}";
 
             // Upload to Cloudinary with transformations
-            $uploadResult = $this->cloudinary->uploadApi()->upload(
+            $uploadResult = $this->ensureCloudinary()->uploadApi()->upload(
                 $file->getRealPath(),
                 [
                     'public_id' => $publicId,
@@ -84,7 +101,7 @@ class PhotoService
             
             // Delete from Cloudinary
             try {
-                $this->cloudinary->uploadApi()->destroy($publicId, [
+                $this->ensureCloudinary()->uploadApi()->destroy($publicId, [
                     'resource_type' => 'image'
                 ]);
             } catch (\Exception $e) {
@@ -107,7 +124,7 @@ class PhotoService
             foreach ($photos as $photo) {
                 try {
                     $publicId = $photo->filename;
-                    $this->cloudinary->uploadApi()->destroy($publicId, [
+                    $this->ensureCloudinary()->uploadApi()->destroy($publicId, [
                         'resource_type' => 'image'
                     ]);
                 } catch (\Exception $e) {
@@ -117,7 +134,7 @@ class PhotoService
 
             // Delete folder from Cloudinary
             try {
-                $this->cloudinary->adminApi()->deleteFolder("user_photos/{$user->id}");
+                $this->ensureCloudinary()->adminApi()->deleteFolder("user_photos/{$user->id}");
             } catch (\Exception $e) {
                 Log::warning('Failed to delete Cloudinary folder: ' . $e->getMessage());
             }

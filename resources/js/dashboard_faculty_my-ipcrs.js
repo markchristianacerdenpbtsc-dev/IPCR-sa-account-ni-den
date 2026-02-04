@@ -33,3 +33,18 @@ document.addEventListener('click', function(e) {
         }
     }
 });
+
+// Create IPCR modal controls
+window.openCreateIpcrModal = function() {
+    const modal = document.getElementById('createIpcrModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+};
+
+window.closeCreateIpcrModal = function() {
+    const modal = document.getElementById('createIpcrModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+};

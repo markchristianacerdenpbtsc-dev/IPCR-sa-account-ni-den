@@ -207,7 +207,7 @@
             <div class="lg:col-span-2 space-y-4 sm:space-y-6">
                 <!-- Header Section -->
                 <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 md:p-8">
-                    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8">Individual Performance Commitment and Review</h1>
+                    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8">Individual Performance Commitment and Review for {{ auth()->user()->designation->title ?? 'Faculty' }}</h1>
                     
                     <!-- User Information Grid -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
@@ -250,7 +250,7 @@
 
                     <!-- Create Button Area -->
                     <div id="createButtonArea" class="py-8 sm:py-12 flex justify-center">
-                        <button class="create-ipcr-button" onclick="showIPCRForm()">
+                        <button class="create-ipcr-button" onclick="openCreateIpcrModal()">
                             Create IPCR
                             <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -258,67 +258,271 @@
                         </button>
                     </div>
 
-                    <!-- IPCR Form (Hidden by default) -->
-                    <div id="ipcrFormContainer" style="display: none;">
-                        <div class="mb-6">
-                            <div class="flex items-center gap-3 mb-4">
-                                <label class="text-sm font-semibold text-gray-700">Template Name:</label>
-                                <input type="text" id="currentTemplateName" placeholder="Enter template name" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                    <!-- Create IPCR Modal -->
+                    <div id="createIpcrModal" class="fixed inset-0 z-50 hidden">
+                        <div class="absolute inset-0 bg-black/50" onclick="closeCreateIpcrModal()"></div>
+                        <div class="relative mx-auto mt-24 w-full max-w-lg bg-white rounded-xl shadow-lg">
+                            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                                <h2 class="text-lg sm:text-xl font-bold text-gray-900">Individual Performance Commitment and Review for {{ auth()->user()->designation->title ?? 'Faculty' }}</h2>
+                                <button type="button" onclick="closeCreateIpcrModal()" class="text-gray-500 hover:text-gray-700">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
                             </div>
-                            <h3 class="text-lg font-bold text-gray-900 mb-4">Rating Period: January - June 2026</h3>
-                        </div>
-
-                        <form id="ipcrForm">
-                            <div class="mb-6">
-                                <!-- Global Formatting Toolbar -->
-                                <div class="format-toolbar mb-4">
-                                    <button type="button" class="format-btn" data-command="bold" title="Bold (Ctrl+B)">
-                                        <b>B</b>
-                                    </button>
-                                    <button type="button" class="format-btn" data-command="italic" title="Italic (Ctrl+I)">
-                                        <i>I</i>
-                                    </button>
-                                    <button type="button" class="format-btn" data-command="underline" title="Underline (Ctrl+U)">
-                                        <u>U</u>
-                                    </button>
+                            <div class="px-6 py-5 space-y-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">School Year</label>
+                                    <select id="ipcrSchoolYear" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        @php
+                                            $currentYear = now()->year;
+                                            $startYear = $currentYear - 5;
+                                        @endphp
+                                        @for ($year = $currentYear; $year >= $startYear; $year--)
+                                            <option value="{{ $year }}-{{ $year + 1 }}">{{ $year }}-{{ $year + 1 }}</option>
+                                        @endfor
+                                    </select>
                                 </div>
-                                
-                                <div class="grid grid-cols-2 gap-4 mb-4">
-                                    <div class="text-center font-semibold text-gray-700">MRO</div>
-                                    <div class="text-center font-semibold text-gray-700">Success Indicators<br>(Target + Measures)</div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Semester</label>
+                                    <select id="ipcrSemester" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="first">First Semester</option>
+                                        <option value="second">Second Semester</option>
+                                    </select>
                                 </div>
-
-                                <!-- Strategic Objectives Container -->
-                                <div id="strategicObjectivesContainer">
-                                    <div class="mb-4">
-                                        <div class="editable-field" contenteditable="true" data-placeholder="Strategic objectives..."></div>
+                                @php
+                                    $deptId = auth()->user()->department_id;
+                                    $deanUser = $deptId
+                                        ? \App\Models\User::where('department_id', $deptId)
+                                            ->whereHas('userRoles', function ($query) {
+                                                $query->where('role', 'dean');
+                                            })
+                                            ->first()
+                                        : null;
+                                @endphp
+                                <div class="pt-2 border-t border-gray-200">
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-500">Name of the Ratee:</label>
+                                            <p class="text-sm font-semibold text-gray-900">{{ auth()->user()->name }}</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-500">Approved By:</label>
+                                            <p class="text-sm font-semibold text-gray-900">TBD</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-500">Noted By:</label>
+                                            <p class="text-sm font-semibold text-gray-900">{{ $deanUser ? $deanUser->name : 'N/A' }}</p>
+                                        </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-2">
+                                <button type="button" onclick="closeCreateIpcrModal()" class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200">Cancel</button>
+                                <button type="button" onclick="proceedCreateIpcr()" class="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700">Proceed</button>
+                            </div>
+                        </div>
+                    </div>
 
-                                <!-- Dynamic Headers Container -->
-                                <div id="headersContainer"></div>
+                    <!-- IPCR Document Modal -->
+                    <div id="ipcrDocumentContainer" class="fixed inset-0 z-50 hidden">
+                        <div class="absolute inset-0 bg-black/50" onclick="closeIpcrDocument()"></div>
+                        <div class="relative mx-auto mt-8 mb-8 w-full max-w-6xl bg-white rounded-xl shadow-lg max-h-[90vh] overflow-y-auto">
+                            <!-- Document Header -->
+                            <div class="bg-gray-50 px-6 py-4 border-b border-gray-300 sticky top-0 bg-white">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-900 mb-2">INDIVIDUAL PERFORMANCE COMMITMENT AND REVIEW (IPCR) FOR {{ strtoupper(auth()->user()->designation->title ?? 'FACULTY') }}</h3>
+                                        <p class="text-sm text-gray-600">School Year: <span id="displaySchoolYear" class="font-semibold"></span></p>
+                                        <p class="text-sm text-gray-600">Semester: <span id="displaySemester" class="font-semibold"></span></p>
+                                    </div>
+                                    <button onclick="closeIpcrDocument()" class="text-gray-500 hover:text-gray-700">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-3 gap-4 text-sm">
+                                    <div>
+                                        <span class="text-gray-600">Ratee:</span>
+                                        <span class="font-semibold text-gray-900">{{ auth()->user()->name }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">Approved By:</span>
+                                        <span class="font-semibold text-gray-900">TBD</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">Noted By:</span>
+                                        <span class="font-semibold text-gray-900">{{ $deanUser ? $deanUser->name : 'N/A' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Excel-like Table -->
+                            <div class="overflow-x-auto px-6 py-4">
+                                <table class="w-full border-collapse">
+                                    <thead>
+                                        <tr class="bg-gray-100">
+                                            <th class="border border-gray-300 px-3 py-2 text-xs font-bold text-gray-700" rowspan="2" style="width: 15%;">MFO</th>
+                                            <th class="border border-gray-300 px-3 py-2 text-xs font-bold text-gray-700" colspan="2" style="width: 25%;">Success Indicator</th>
+                                            <th class="border border-gray-300 px-3 py-2 text-xs font-bold text-gray-700" rowspan="2" style="width: 20%;">Actual Accomplishment</th>
+                                            <th class="border border-gray-300 px-3 py-2 text-xs font-bold text-gray-700" colspan="4">Rating</th>
+                                            <th class="border border-gray-300 px-3 py-2 text-xs font-bold text-gray-700" rowspan="2" style="width: 15%;">Remarks</th>
+                                        </tr>
+                                        <tr class="bg-gray-100">
+                                            <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-600">Target</th>
+                                            <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-600">Measures</th>
+                                            <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-600" style="width: 8%;">Q</th>
+                                            <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-600" style="width: 8%;">E</th>
+                                            <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-600" style="width: 8%;">T</th>
+                                            <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-600" style="width: 8%;">A</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ipcrTableBody">
+                                        <!-- Strategic Objectives Section -->
+                                        <tr class="bg-blue-50">
+                                            <td colspan="9" class="border border-gray-300 px-3 py-2">
+                                                <input type="text" class="w-full bg-transparent border-0 focus:ring-0 font-bold text-gray-900" value="Strategic Objectives" />
+                                            </td>
+                                        </tr>
+                                        <tr class="bg-blue-100">
+                                            <td colspan="9" class="border border-gray-300 px-3 py-2">
+                                                <input type="text" class="w-full bg-transparent border-0 focus:ring-0 font-semibold text-gray-800" value="SO I: PROMOTING ACCESS TO QUALITY EDUCATION" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-gray-300 px-2 py-2">
+                                                <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0" placeholder="Enter MFO"></textarea>
+                                            </td>
+                                            <td class="border border-gray-300 px-2 py-2">
+                                                <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0" placeholder="Enter Target"></textarea>
+                                            </td>
+                                            <td class="border border-gray-300 px-2 py-2">
+                                                <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0"></textarea>
+                                            </td>
+                                            <td class="border border-gray-300 px-2 py-2">
+                                                <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0"></textarea>
+                                            </td>
+                                            <td class="border border-gray-300 px-2 py-2">
+                                                <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5">
+                                            </td>
+                                            <td class="border border-gray-300 px-2 py-2">
+                                                <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5">
+                                            </td>
+                                            <td class="border border-gray-300 px-2 py-2">
+                                                <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5">
+                                            </td>
+                                            <td class="border border-gray-300 px-2 py-2">
+                                                <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5">
+                                            </td>
+                                            <td class="border border-gray-300 px-2 py-2">
+                                                <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0"></textarea>
+                                            </td>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
 
                             <!-- Action Buttons -->
-                            <div class="flex flex-wrap gap-3 justify-between items-center">
+                            <div class="px-6 py-4 bg-gray-50 border-t border-gray-300 flex justify-between items-center gap-3 sticky bottom-0">
                                 <div class="flex gap-3">
-                                    <button type="button" onclick="addHeader()" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 font-semibold text-sm">
-                                        + Add Header
+                                    <button type="button" onclick="addSectionHeader()" class="px-4 py-2 rounded-lg text-sm font-semibold text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100">
+                                        + Add Section Header
                                     </button>
-                                    <button type="button" onclick="addRow()" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 font-semibold text-sm">
+                                    <button type="button" onclick="addSOHeader()" class="px-4 py-2 rounded-lg text-sm font-semibold text-purple-600 bg-purple-50 border border-purple-200 hover:bg-purple-100">
+                                        + Add SO Header
+                                    </button>
+                                    <button type="button" onclick="addDataRow()" class="px-4 py-2 rounded-lg text-sm font-semibold text-green-600 bg-green-50 border border-green-200 hover:bg-green-100">
                                         + Add Row
                                     </button>
+                                    <button type="button" onclick="removeLastRow()" class="px-4 py-2 rounded-lg text-sm font-semibold text-red-600 bg-red-50 border border-red-200 hover:bg-red-100">
+                                        - Remove Last Row
+                                    </button>
                                 </div>
                                 <div class="flex gap-3">
-                                    <button type="button" onclick="clearForm()" class="text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-100 font-semibold text-sm">
-                                        Clear Form
-                                    </button>
-                                    <button type="button" id="saveButton" onclick="generateIPCR()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-semibold text-sm">
-                                        Generate IPCR
-                                    </button>
+                                    <button type="button" onclick="closeIpcrDocument()" class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50">Close</button>
+                                    <button type="button" onclick="saveIpcrDocument()" class="px-6 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700">Save</button>
                                 </div>
                             </div>
-                        </form>
+                        </div>
+                    </div>
+
+                    <!-- IPCR Form Modal -->
+                    <div id="ipcrFormModal" class="fixed inset-0 z-50 hidden">
+                        <div class="absolute inset-0 bg-black/50" onclick="closeIpcrFormModal()"></div>
+                        <div class="relative mx-auto mt-12 w-full max-w-4xl bg-white rounded-xl shadow-lg max-h-[85vh] overflow-y-auto">
+                            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 sticky top-0 bg-white">
+                                <h2 class="text-lg sm:text-xl font-bold text-gray-900">IPCR Template Builder</h2>
+                                <button type="button" onclick="closeIpcrFormModal()" class="text-gray-500 hover:text-gray-700">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="px-6 py-5">
+                                <div class="mb-6">
+                                    <div class="flex items-center gap-3 mb-4">
+                                        <label class="text-sm font-semibold text-gray-700">Template Name:</label>
+                                        <input type="text" id="currentTemplateName" placeholder="Enter template name" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                                    </div>
+                                    <h3 class="text-lg font-bold text-gray-900 mb-4">Rating Period: January - June 2026</h3>
+                                </div>
+
+                                <form id="ipcrForm">
+                                    <div class="mb-6">
+                                        <!-- Global Formatting Toolbar -->
+                                        <div class="format-toolbar mb-4">
+                                            <button type="button" class="format-btn" data-command="bold" title="Bold (Ctrl+B)">
+                                                <b>B</b>
+                                            </button>
+                                            <button type="button" class="format-btn" data-command="italic" title="Italic (Ctrl+I)">
+                                                <i>I</i>
+                                            </button>
+                                            <button type="button" class="format-btn" data-command="underline" title="Underline (Ctrl+U)">
+                                                <u>U</u>
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-2 gap-4 mb-4">
+                                            <div class="text-center font-semibold text-gray-700">MRO</div>
+                                            <div class="text-center font-semibold text-gray-700">Success Indicators<br>(Target + Measures)</div>
+                                        </div>
+
+                                        <!-- Strategic Objectives Container -->
+                                        <div id="strategicObjectivesContainer">
+                                            <div class="mb-4">
+                                                <div class="editable-field" contenteditable="true" data-placeholder="Strategic objectives..."></div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Dynamic Headers Container -->
+                                        <div id="headersContainer"></div>
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div class="flex flex-wrap gap-3 justify-between items-center border-t border-gray-200 pt-4">
+                                        <div class="flex gap-3">
+                                            <button type="button" onclick="addHeader()" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 font-semibold text-sm">
+                                                + Add Header
+                                            </button>
+                                            <button type="button" onclick="addRow()" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 font-semibold text-sm">
+                                                + Add Row
+                                            </button>
+                                        </div>
+                                        <div class="flex gap-3">
+                                            <button type="button" onclick="clearForm()" class="text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-100 font-semibold text-sm">
+                                                Clear Form
+                                            </button>
+                                            <button type="button" onclick="closeIpcrFormModal()" class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50">Close</button>
+                                            <button type="button" id="saveButton" onclick="generateIPCR()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-semibold text-sm">
+                                                Generate IPCR
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Previous Submissions and Saved Copy Section -->
@@ -327,56 +531,15 @@
                         <div>
                             <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Previous IPCR Submissions</h3>
                             <div class="space-y-2 sm:space-y-3">
-                                <!-- Submission 1 -->
-                                <div class="submission-card">
-                                    <div class="flex justify-between items-center gap-2">
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-sm sm:text-base font-semibold text-gray-900">2025 - 2026</p>
-                                            <p class="text-xs text-gray-500 mt-1">Submitted on May 5, 2026</p>
-                                        </div>
-                                        <button class="text-blue-600 hover:text-blue-700 font-semibold text-xs sm:text-sm flex-shrink-0">View</button>
-                                    </div>
-                                </div>
-
-                                <!-- Submission 2 -->
-                                <div class="submission-card">
-                                    <div class="flex justify-between items-center gap-2">
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-sm sm:text-base font-semibold text-gray-900">2025 - 2026</p>
-                                            <p class="text-xs text-gray-500 mt-1">Submitted on Dec 8, 2025</p>
-                                        </div>
-                                        <button class="text-blue-600 hover:text-blue-700 font-semibold text-xs sm:text-sm flex-shrink-0">View</button>
-                                    </div>
-                                </div>
-
-                                <!-- Submission 3 -->
-                                <div class="submission-card">
-                                    <div class="flex justify-between items-center gap-2">
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-sm sm:text-base font-semibold text-gray-900">2024 - 2025</p>
-                                            <p class="text-xs text-gray-500 mt-1">Submitted on May 8, 2025</p>
-                                        </div>
-                                        <button class="text-blue-600 hover:text-blue-700 font-semibold text-xs sm:text-sm flex-shrink-0">View</button>
-                                    </div>
-                                </div>
+                                <p class="text-sm text-gray-500 text-center py-6">No submissions yet. Create and submit an IPCR to see them here.</p>
                             </div>
                         </div>
 
                         <!-- Saved Copy -->
                         <div>
                             <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Saved Copy</h3>
-                            <div class="space-y-2 sm:space-y-3">
-                                <!-- Saved Copy Item -->
-                                <div class="submission-card">
-                                    <div class="flex justify-between items-start gap-2">
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-xs sm:text-sm font-semibold text-gray-900">Individual Performance Commitment and Review (IPCR) for Faculty with Designation</p>
-                                            <p class="text-xs text-gray-500 mt-1">Submitted on May 5, 2026</p>
-                                        </div>
-                                        <button class="text-blue-600 hover:text-blue-700 font-semibold text-xs sm:text-sm flex-shrink-0">View</button>
-                                    </div>
-                                </div>
-                            </div>
+                            <div id="savedCopiesList" class="space-y-2 sm:space-y-3"></div>
+                            <p id="savedCopiesEmpty" class="text-sm text-gray-500 text-center py-6">No saved copies yet. Save your IPCR draft to see them here.</p>
                         </div>
                     </div>
                 </div>
@@ -414,6 +577,59 @@
                         @endforelse
                     </div>
                 </div>
+
+                <!-- Submit IPCR -->
+                <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+                    <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Submit IPCR</h3>
+                    @php
+                        $currentYear = now()->year;
+                        $currentSchoolYear = $currentYear . '-' . ($currentYear + 1);
+                        $currentSemester = now()->month <= 6 ? 'First Semester' : 'Second Semester';
+                    @endphp
+                    <div class="space-y-2 text-sm text-gray-700">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-500">Current Sem:</span>
+                            <span class="font-semibold text-gray-900">{{ $currentSemester }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-500">Current Year:</span>
+                            <span class="font-semibold text-gray-900">{{ $currentSchoolYear }}</span>
+                        </div>
+                    </div>
+                    <button type="button" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 rounded" onclick="openSubmitIpcrModal()">
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit IPCR Modal -->
+    <div id="submitIpcrModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full animate-scale-in">
+            <div class="bg-blue-50 border-b border-blue-200 px-6 py-4 flex items-center justify-between">
+                <h2 class="text-lg font-bold text-gray-900">Submit IPCR</h2>
+                <button type="button" onclick="closeSubmitIpcrModal()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="px-6 py-4 space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Select Saved Copy</label>
+                    <select id="submitSavedCopySelect" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">No saved copies found</option>
+                    </select>
+                </div>
+            </div>
+            <div class="bg-gray-50 border-t border-gray-200 px-6 py-4 flex gap-3 justify-end">
+                <button type="button" onclick="closeSubmitIpcrModal()" class="px-4 py-2 rounded-lg font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition text-sm">
+                    Cancel
+                </button>
+                <button type="button" onclick="submitSelectedCopy()" class="px-4 py-2 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition text-sm">
+                    Submit
+                </button>
             </div>
         </div>
     </div>
@@ -422,7 +638,7 @@
     <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full animate-scale-in">
             <div id="modalHeader" class="bg-yellow-50 border-b border-yellow-200 px-6 py-4 flex items-center gap-3">
-                <div class="bg-yellow-100 rounded-full p-3">
+                <div class="bg-yellow-100 rounded-full w-12 h-12 flex items-center justify-center">
                     <i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>
                 </div>
                 <div>
@@ -451,7 +667,7 @@
     <div id="alertModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full animate-scale-in">
             <div id="alertModalHeader" class="bg-blue-50 border-b border-blue-200 px-6 py-4 flex items-center gap-3">
-                <div id="alertModalIconContainer" class="bg-blue-100 rounded-full p-3">
+                <div id="alertModalIconContainer" class="bg-blue-100 rounded-full w-12 h-12 flex items-center justify-center">
                     <i id="alertModalIcon" class="fas fa-info-circle text-blue-600 text-xl"></i>
                 </div>
                 <div>
@@ -550,11 +766,461 @@
 
     <script>
         let headerCount = 0;
+        let soHeaderCount = 1;
         let currentHeaderForRows = null;
         let pendingAction = null;
         let pendingActionData = null;
         let isEditMode = false;
         let currentTemplateId = null;
+        let currentSavedCopyId = null;
+        const ipcrRoleLabel = @json(auth()->user()->designation->title ?? 'Faculty');
+        const savedCopiesKey = 'ipcrSavedCopies';
+        const csrfToken = @json(csrf_token());
+
+        function openCreateIpcrModal() {
+            const modal = document.getElementById('createIpcrModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function closeCreateIpcrModal() {
+            const modal = document.getElementById('createIpcrModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function proceedCreateIpcr() {
+            const schoolYear = document.getElementById('ipcrSchoolYear').value;
+            const semester = document.getElementById('ipcrSemester').value;
+            
+            // Update display values
+            document.getElementById('displaySchoolYear').textContent = schoolYear;
+            document.getElementById('displaySemester').textContent = semester === 'first' ? 'First Semester' : 'Second Semester';
+            
+            // Hide modal and create button
+            closeCreateIpcrModal();
+            document.getElementById('createButtonArea').style.display = 'none';
+            
+            // Show IPCR document modal
+            document.getElementById('ipcrDocumentContainer').classList.remove('hidden');
+        }
+
+        function closeIpcrDocument() {
+            document.getElementById('ipcrDocumentContainer').classList.add('hidden');
+            document.getElementById('createButtonArea').style.display = 'flex';
+            currentSavedCopyId = null;
+        }
+
+        function openIpcrFormModal() {
+            const modal = document.getElementById('ipcrFormModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function closeIpcrFormModal() {
+            const modal = document.getElementById('ipcrFormModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function openSubmitIpcrModal() {
+            populateSubmitSavedCopies();
+            const modal = document.getElementById('submitIpcrModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function closeSubmitIpcrModal() {
+            const modal = document.getElementById('submitIpcrModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function populateSubmitSavedCopies() {
+            const select = document.getElementById('submitSavedCopySelect');
+            if (!select) return;
+
+            const savedCopies = getSavedCopies();
+            select.innerHTML = '';
+
+            if (savedCopies.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'No saved copies found';
+                select.appendChild(option);
+                select.disabled = true;
+                return;
+            }
+
+            select.disabled = false;
+            savedCopies.forEach(copy => {
+                const option = document.createElement('option');
+                option.value = copy.id;
+                option.textContent = `${copy.title} • ${copy.schoolYear} • ${copy.semester}`;
+                select.appendChild(option);
+            });
+        }
+
+        function submitSelectedCopy() {
+            const select = document.getElementById('submitSavedCopySelect');
+            const selectedId = select ? select.value : '';
+            if (!selectedId) {
+                showAlertModal('warning', 'Select a Copy', 'Please select a saved copy to submit.');
+                return;
+            }
+            const savedCopies = getSavedCopies();
+            const item = savedCopies.find(copy => String(copy.id) === String(selectedId));
+            if (!item) {
+                showAlertModal('error', 'Not Found', 'Selected saved copy could not be found.');
+                return;
+            }
+
+            fetch('/faculty/ipcr/submissions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: item.title,
+                    school_year: item.schoolYear,
+                    semester: item.semester,
+                    table_body_html: item.tableBodyHtml || ''
+                })
+            })
+                .then(async response => {
+                    if (!response.ok) {
+                        const data = await response.json().catch(() => ({}));
+                        throw new Error(data.message || 'Failed to submit IPCR');
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    closeSubmitIpcrModal();
+                    showAlertModal('success', 'Submitted', 'Your IPCR has been submitted successfully.');
+                })
+                .catch(error => {
+                    showAlertModal('error', 'Submit Failed', error.message || 'Failed to submit IPCR.');
+                });
+        }
+
+        function saveIpcrDocument() {
+            const schoolYear = document.getElementById('displaySchoolYear')?.textContent?.trim();
+            const semester = document.getElementById('displaySemester')?.textContent?.trim();
+            const title = `Individual Performance Commitment and Review (IPCR) for ${ipcrRoleLabel}`;
+            const tableBody = document.getElementById('ipcrTableBody');
+            const tableBodyHtml = tableBody ? buildTableBodySnapshot(tableBody) : '';
+
+            const savedCopies = getSavedCopies();
+            const payload = {
+                id: currentSavedCopyId || Date.now(),
+                title,
+                schoolYear: schoolYear || 'N/A',
+                semester: semester || 'N/A',
+                tableBodyHtml,
+                savedAt: new Date().toISOString()
+            };
+
+            if (currentSavedCopyId) {
+                const index = savedCopies.findIndex(copy => copy.id === currentSavedCopyId);
+                if (index !== -1) {
+                    savedCopies.splice(index, 1);
+                }
+            }
+
+            savedCopies.unshift(payload);
+            setSavedCopies(savedCopies);
+            renderSavedCopies();
+            showAlertModal('success', 'Saved', currentSavedCopyId ? 'Your IPCR draft was updated successfully.' : 'Your IPCR draft was saved successfully.');
+            currentSavedCopyId = payload.id;
+        }
+
+        function getSavedCopies() {
+            try {
+                const raw = localStorage.getItem(savedCopiesKey);
+                return raw ? JSON.parse(raw) : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function setSavedCopies(items) {
+            localStorage.setItem(savedCopiesKey, JSON.stringify(items));
+        }
+
+        function buildTableBodySnapshot(tableBody) {
+            const clone = tableBody.cloneNode(true);
+            clone.querySelectorAll('input, textarea').forEach(field => {
+                if (field.tagName.toLowerCase() === 'input') {
+                    field.setAttribute('value', field.value);
+                } else if (field.tagName.toLowerCase() === 'textarea') {
+                    field.textContent = field.value;
+                }
+            });
+            return clone.innerHTML;
+        }
+
+        function formatSavedDate(isoDate) {
+            const date = new Date(isoDate);
+            if (Number.isNaN(date.getTime())) {
+                return 'Unknown date';
+            }
+            return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function renderSavedCopies() {
+            const list = document.getElementById('savedCopiesList');
+            const empty = document.getElementById('savedCopiesEmpty');
+            if (!list || !empty) return;
+
+            const savedCopies = getSavedCopies();
+            list.innerHTML = '';
+
+            if (savedCopies.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            savedCopies.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'submission-card';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start gap-2">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs sm:text-sm font-semibold text-gray-900">${item.title}</p>
+                            <p class="text-xs text-gray-500 mt-1">${item.schoolYear} • ${item.semester}</p>
+                            <p class="text-xs text-gray-500 mt-1">Saved on ${formatSavedDate(item.savedAt)}</p>
+                        </div>
+                        <div class="flex gap-2 flex-shrink-0">
+                            <button class="text-blue-600 hover:text-blue-700 font-semibold text-xs sm:text-sm" onclick="editSavedCopy(${item.id})">View</button>
+                            <button class="text-red-600 hover:text-red-700 font-semibold text-xs sm:text-sm" onclick="deleteSavedCopy(${item.id})">Delete</button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function deleteSavedCopy(id) {
+            const savedCopies = getSavedCopies();
+            const filtered = savedCopies.filter(copy => copy.id !== id);
+            setSavedCopies(filtered);
+            if (currentSavedCopyId === id) {
+                currentSavedCopyId = null;
+            }
+            renderSavedCopies();
+            showAlertModal('success', 'Deleted', 'Saved copy deleted successfully.');
+        }
+
+        function updateSoHeaderCountFromTable() {
+            const tableBody = document.getElementById('ipcrTableBody');
+            if (!tableBody) return;
+
+            const rows = tableBody.querySelectorAll('tr.bg-blue-100');
+            let count = 0;
+            rows.forEach(row => {
+                const input = row.querySelector('input[type="text"]');
+                if (input && input.value.includes('SO')) {
+                    count += 1;
+                }
+            });
+            soHeaderCount = Math.max(1, count);
+        }
+
+        function editSavedCopy(id) {
+            const savedCopies = getSavedCopies();
+            const item = savedCopies.find(copy => copy.id === id);
+            if (!item) {
+                showAlertModal('error', 'Not Found', 'Saved copy could not be found.');
+                return;
+            }
+
+            const tableBody = document.getElementById('ipcrTableBody');
+            if (tableBody && item.tableBodyHtml) {
+                tableBody.innerHTML = item.tableBodyHtml;
+            }
+
+            if (item.schoolYear) {
+                const displaySchoolYear = document.getElementById('displaySchoolYear');
+                if (displaySchoolYear) displaySchoolYear.textContent = item.schoolYear;
+            }
+            if (item.semester) {
+                const displaySemester = document.getElementById('displaySemester');
+                if (displaySemester) displaySemester.textContent = item.semester;
+            }
+
+            updateSoHeaderCountFromTable();
+            currentSavedCopyId = item.id;
+            document.getElementById('createButtonArea').style.display = 'none';
+            document.getElementById('ipcrDocumentContainer').classList.remove('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderSavedCopies();
+        });
+
+        function addSectionHeader() {
+            const tableBody = document.getElementById('ipcrTableBody');
+            if (!tableBody) return;
+            
+            // Create new section header row
+            const newRow = document.createElement('tr');
+            newRow.className = 'bg-blue-100';
+            newRow.innerHTML = `
+                <td colspan="9" class="border border-gray-300 px-3 py-2 font-semibold text-gray-800">
+                    <input type="text" class="w-full bg-transparent border-0 focus:ring-0 font-semibold text-gray-800" placeholder="Enter section header..." value="Strategic objectives" />
+                </td>
+            `;
+            
+            // Append to table
+            tableBody.appendChild(newRow);
+        }
+
+        function addSOHeader() {
+            const tableBody = document.getElementById('ipcrTableBody');
+            if (!tableBody) return;
+            
+            soHeaderCount++;
+            const soNumber = this.soHeaderCount || soHeaderCount;
+            const romanNumerals = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+            const soLabel = romanNumerals[soHeaderCount] || 'SO ' + soHeaderCount;
+            
+            // Create new SO header row
+            const newRow = document.createElement('tr');
+            newRow.className = 'bg-blue-100';
+            newRow.innerHTML = `
+                <td colspan="9" class="border border-gray-300 px-3 py-2 font-semibold text-gray-800">
+                    <input type="text" class="w-full bg-transparent border-0 focus:ring-0 font-semibold text-gray-800" placeholder="Enter SO description..." value="SO ${soLabel}: YOUR SO DESCRIPTION HERE" />
+                </td>
+            `;
+            
+            // Append to table
+            tableBody.appendChild(newRow);
+        }
+
+        function addDataRow() {
+            const tableBody = document.getElementById('ipcrTableBody');
+            if (!tableBody) return;
+            
+            // Create new data row
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td class="border border-gray-300 px-2 py-2">
+                    <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0" placeholder="Enter MFO"></textarea>
+                </td>
+                <td class="border border-gray-300 px-2 py-2">
+                    <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0"></textarea>
+                </td>
+                <td class="border border-gray-300 px-2 py-2">
+                    <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0"></textarea>
+                </td>
+                <td class="border border-gray-300 px-2 py-2">
+                    <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0"></textarea>
+                </td>
+                <td class="border border-gray-300 px-2 py-2">
+                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5" value="">
+                </td>
+                <td class="border border-gray-300 px-2 py-2">
+                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5" value="">
+                </td>
+                <td class="border border-gray-300 px-2 py-2">
+                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5" value="">
+                </td>
+                <td class="border border-gray-300 px-2 py-2">
+                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5" value="">
+                </td>
+                <td class="border border-gray-300 px-2 py-2">
+                    <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0"></textarea>
+                </td>
+            `;
+            
+            // Append to table
+            tableBody.appendChild(newRow);
+        }
+
+        function deleteSectionHeader(button) {
+            // Find the parent row and remove it
+            const row = button.closest('tr');
+            if (row) {
+                row.remove();
+            }
+        }
+
+        function removeLastSectionHeader() {
+            const tableBody = document.getElementById('ipcrTableBody');
+            if (!tableBody) return;
+            
+            // Find all rows and remove the last one that looks like a section header (bg-blue-100 or bg-blue-50)
+            const rows = tableBody.querySelectorAll('tr');
+            for (let i = rows.length - 1; i >= 0; i--) {
+                if (rows[i].classList.contains('bg-blue-100') || rows[i].classList.contains('bg-blue-50')) {
+                    rows[i].remove();
+                    break;
+                }
+            }
+        }
+
+        function removeLastSOHeader() {
+            const tableBody = document.getElementById('ipcrTableBody');
+            if (!tableBody) return;
+            
+            // Find all rows and remove the last one that is a SO header (bg-blue-100 with specific structure)
+            const rows = tableBody.querySelectorAll('tr');
+            for (let i = rows.length - 1; i >= 0; i--) {
+                if (rows[i].classList.contains('bg-blue-100')) {
+                    const span = rows[i].querySelector('span');
+                    if (span && span.textContent.includes('SO')) {
+                        rows[i].remove();
+                        soHeaderCount--;
+                        break;
+                    }
+                }
+            }
+        }
+
+        function removeLastDataRow() {
+            const tableBody = document.getElementById('ipcrTableBody');
+            if (!tableBody) return;
+            
+            // Find all rows and remove the last one that is a data row (no special classes)
+            const rows = tableBody.querySelectorAll('tr');
+            for (let i = rows.length - 1; i >= 0; i--) {
+                if (!rows[i].classList.contains('bg-blue-50') && 
+                    !rows[i].classList.contains('bg-blue-100') && 
+                    !rows[i].classList.contains('bg-green-100') &&
+                    !rows[i].classList.contains('bg-gray-100')) {
+                    rows[i].remove();
+                    break;
+                }
+            }
+        }
+
+        function removeLastRow() {
+            const tableBody = document.getElementById('ipcrTableBody');
+            if (!tableBody) return;
+            
+            // Remove the last row in the table body
+            const rows = tableBody.querySelectorAll('tr');
+            if (rows.length > 0) {
+                const lastRow = rows[rows.length - 1];
+                // Check if it's a SO header and decrement counter
+                if (lastRow.classList.contains('bg-blue-100')) {
+                    const input = lastRow.querySelector('input[type="text"]');
+                    if (input && input.value.includes('SO')) {
+                        soHeaderCount--;
+                    }
+                }
+                lastRow.remove();
+            }
+        }
 
         // Text formatting functions
         let activeEditableField = null;
@@ -642,8 +1308,7 @@
         }
         
         function showIPCRForm() {
-            document.getElementById('createButtonArea').style.display = 'none';
-            document.getElementById('ipcrFormContainer').style.display = 'block';
+            openIpcrFormModal();
             
             // Initialize toolbar event listeners
             initFormatToolbar();
@@ -1188,12 +1853,12 @@
             // Set styling based on type
             if (type === 'danger') {
                 modalHeader.className = 'bg-red-50 border-b border-red-200 px-6 py-4 flex items-center gap-3';
-                modalHeader.querySelector('div').className = 'bg-red-100 rounded-full p-3';
+                modalHeader.querySelector('div').className = 'bg-red-100 rounded-full w-12 h-12 flex items-center justify-center';
                 modalHeader.querySelector('i').className = 'fas fa-exclamation-triangle text-red-600 text-xl';
                 confirmButton.className = 'px-4 py-2 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-700 transition flex items-center gap-2 text-sm';
             } else {
                 modalHeader.className = 'bg-yellow-50 border-b border-yellow-200 px-6 py-4 flex items-center gap-3';
-                modalHeader.querySelector('div').className = 'bg-yellow-100 rounded-full p-3';
+                modalHeader.querySelector('div').className = 'bg-yellow-100 rounded-full w-12 h-12 flex items-center justify-center';
                 modalHeader.querySelector('i').className = 'fas fa-exclamation-triangle text-yellow-600 text-xl';
                 confirmButton.className = 'px-4 py-2 rounded-lg font-semibold text-white bg-yellow-600 hover:bg-yellow-700 transition flex items-center gap-2 text-sm';
             }
