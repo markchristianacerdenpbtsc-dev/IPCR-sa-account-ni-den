@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password - University of Rizal System Binangonan</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/urs_logo.jpg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    @vite(['resources/css/auth_login.css', 'resources/js/auth_login.js'])
+    @vite(['resources/css/auth_login.css', 'resources/css/auth_reset-password.css', 'resources/js/auth_login.js', 'resources/js/auth_reset-password.js'])
 </head>
 <body class="gradient-bg">
     <div class="login-container">
@@ -17,7 +18,7 @@
 
         <div class="login-box">
             <div class="login-header">
-                <h2>Reset Password</h2>
+                <h2>Create New Password</h2>
             </div>
 
             <div class="login-body">
@@ -35,40 +36,23 @@
                     </div>
                 @endif
 
-                <p style="margin-bottom: 20px; color: #666; font-size: 14px;">
-                    Enter the 6-digit verification code sent to your email and your new password.
-                </p>
+                <div class="verified-badge">
+                    <i class="fas fa-check-circle"></i>
+                    Email verified: {{ $email ?? session('verified_email') }}
+                </div>
+
+                <div class="password-requirements">
+                    <p>Password Requirements:</p>
+                    <ul>
+                        <li>At least 8 characters long</li>
+                        <li>Use a mix of letters, numbers, and symbols for better security</li>
+                    </ul>
+                </div>
 
                 <form method="POST" action="{{ route('password.update') }}">
                     @csrf
-
-                    <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            placeholder="Enter your email address"
-                            value="{{ $email ?? old('email') }}"
-                            required
-                            {{ $email ? 'readonly' : '' }}
-                        >
-                    </div>
-
-                    <div class="form-group">
-                        <label for="code">Verification Code</label>
-                        <input
-                            type="text"
-                            id="code"
-                            name="code"
-                            placeholder="Enter 6-digit code"
-                            maxlength="6"
-                            pattern="[0-9]{6}"
-                            value="{{ old('code') }}"
-                            required
-                            autofocus
-                        >
-                    </div>
+                    <input type="hidden" name="email" value="{{ $email ?? session('verified_email') }}">
+                    <input type="hidden" name="reset_token" value="{{ $reset_token ?? session('reset_token') }}">
 
                     <div class="form-group">
                         <label for="password">New Password</label>
@@ -79,6 +63,7 @@
                                 name="password"
                                 placeholder="Enter new password"
                                 required
+                                autofocus
                             >
                             <button type="button" class="toggle-btn" onclick="togglePasswordVisibility()">
                                 <i class="fas fa-eye"></i>
@@ -106,28 +91,10 @@
                 </form>
 
                 <div class="back-link">
-                    <a href="{{ route('password.request') }}">← Resend Code</a>
+                    <a href="{{ route('password.request') }}">← Start Over</a>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-        function toggleConfirmPasswordVisibility() {
-            const passwordInput = document.getElementById('password_confirmation');
-            const toggleBtn = passwordInput.nextElementSibling;
-            const icon = toggleBtn.querySelector('i');
-
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        }
-    </script>
 </body>
 </html>

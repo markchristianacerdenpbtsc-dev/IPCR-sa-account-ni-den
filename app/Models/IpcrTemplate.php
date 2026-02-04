@@ -13,12 +13,18 @@ class IpcrTemplate extends Model
         'user_id',
         'title',
         'period',
+        'school_year',
+        'semester',
         'content',
+        'table_body_html',
+        'is_active',
+        'so_count_json',
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'so_count_json' => 'array',
     ];
 
     /**

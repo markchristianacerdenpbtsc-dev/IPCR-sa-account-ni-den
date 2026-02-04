@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\PhotoController;
 use App\Http\Controllers\Faculty\IpcrTemplateController;
 use App\Http\Controllers\Faculty\IpcrSubmissionController;
+use App\Http\Controllers\Faculty\IpcrSavedCopyController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -45,6 +46,14 @@ Route::get('/forgot-password', [PasswordResetController::class, 'showForgotPassw
 
 Route::post('/forgot-password', [PasswordResetController::class, 'sendResetCode'])
     ->name('password.email')
+    ->middleware('guest');
+
+Route::get('/verify-code', [PasswordResetController::class, 'showVerifyCodeForm'])
+    ->name('password.verify.form')
+    ->middleware('guest');
+
+Route::post('/verify-code', [PasswordResetController::class, 'verifyCode'])
+    ->name('password.verify')
     ->middleware('guest');
 
 Route::get('/reset-password', [PasswordResetController::class, 'showResetPasswordForm'])
@@ -103,6 +112,14 @@ Route::post('/faculty/ipcr/store', [IpcrTemplateController::class, 'store'])
     ->name('faculty.ipcr.store')
     ->middleware(['auth', 'role:faculty']);
 
+Route::post('/faculty/ipcr/templates/from-saved-copy', [IpcrTemplateController::class, 'storeFromSavedCopy'])
+    ->name('faculty.ipcr.templates.from-saved-copy')
+    ->middleware(['auth', 'role:faculty']);
+
+Route::post('/faculty/ipcr/templates/{id}/save-copy', [IpcrTemplateController::class, 'saveCopy'])
+    ->name('faculty.ipcr.templates.save-copy')
+    ->middleware(['auth', 'role:faculty']);
+
 Route::get('/faculty/ipcr/templates/{id}', [IpcrTemplateController::class, 'show'])
     ->middleware(['auth', 'role:faculty']);
 
@@ -112,9 +129,33 @@ Route::delete('/faculty/ipcr/templates/{id}', [IpcrTemplateController::class, 'd
 Route::put('/faculty/ipcr/templates/{id}', [IpcrTemplateController::class, 'update'])
     ->middleware(['auth', 'role:faculty']);
 
+Route::post('/faculty/ipcr/templates/{id}/set-active', [IpcrTemplateController::class, 'setActive'])
+    ->middleware(['auth', 'role:faculty']);
+
 // IPCR Submission Routes
 Route::post('/faculty/ipcr/submissions', [IpcrSubmissionController::class, 'store'])
     ->name('faculty.ipcr.submissions.store')
+    ->middleware(['auth', 'role:faculty']);
+
+// IPCR Saved Copy Routes
+Route::get('/faculty/ipcr/saved-copies', [IpcrSavedCopyController::class, 'index'])
+    ->name('faculty.ipcr.saved-copies.index')
+    ->middleware(['auth', 'role:faculty']);
+
+Route::post('/faculty/ipcr/saved-copies', [IpcrSavedCopyController::class, 'store'])
+    ->name('faculty.ipcr.saved-copies.store')
+    ->middleware(['auth', 'role:faculty']);
+
+Route::get('/faculty/ipcr/saved-copies/{id}', [IpcrSavedCopyController::class, 'show'])
+    ->name('faculty.ipcr.saved-copies.show')
+    ->middleware(['auth', 'role:faculty']);
+
+Route::put('/faculty/ipcr/saved-copies/{id}', [IpcrSavedCopyController::class, 'update'])
+    ->name('faculty.ipcr.saved-copies.update')
+    ->middleware(['auth', 'role:faculty']);
+
+Route::delete('/faculty/ipcr/saved-copies/{id}', [IpcrSavedCopyController::class, 'destroy'])
+    ->name('faculty.ipcr.saved-copies.destroy')
     ->middleware(['auth', 'role:faculty']);
 
 

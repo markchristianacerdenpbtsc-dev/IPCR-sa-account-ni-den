@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>My IPCRs - IPCR Dashboard</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/urs_logo.jpg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @vite(['resources/css/dashboard_faculty_my-ipcrs.css', 'resources/js/dashboard_faculty_my-ipcrs.js'])
@@ -331,40 +332,158 @@
                     <!-- IPCR Document Modal -->
                     <div id="ipcrDocumentContainer" class="fixed inset-0 z-50 hidden">
                         <div class="absolute inset-0 bg-black/50" onclick="closeIpcrDocument()"></div>
-                        <div class="relative mx-auto mt-8 mb-8 w-full max-w-6xl bg-white rounded-xl shadow-lg max-h-[90vh] overflow-y-auto">
+                        <div class="relative mx-auto mt-2 sm:mt-8 mb-2 sm:mb-8 w-full max-w-6xl bg-white rounded-lg sm:rounded-xl shadow-lg max-h-[98vh] sm:max-h-[90vh] overflow-y-auto px-2 sm:px-0">
                             <!-- Document Header -->
-                            <div class="bg-gray-50 px-6 py-4 border-b border-gray-300 sticky top-0 bg-white">
-                                <div class="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h3 class="text-lg font-bold text-gray-900 mb-2">INDIVIDUAL PERFORMANCE COMMITMENT AND REVIEW (IPCR) FOR {{ strtoupper(auth()->user()->designation->title ?? 'FACULTY') }}</h3>
-                                        <p class="text-sm text-gray-600">School Year: <span id="displaySchoolYear" class="font-semibold"></span></p>
-                                        <p class="text-sm text-gray-600">Semester: <span id="displaySemester" class="font-semibold"></span></p>
+                            <div class="bg-gray-50 px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-300 sticky top-0 bg-white z-10">
+                                <div class="flex justify-between items-start mb-3 sm:mb-4">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-1 sm:gap-2 mb-2">
+                                            <input type="text" id="ipcrDocumentTitle" class="text-sm sm:text-lg font-bold text-gray-900 border-0 border-b-2 border-transparent hover:border-gray-300 focus:border-blue-500 focus:ring-0 bg-transparent px-1 sm:px-2 py-1 -ml-1 sm:-ml-2 w-full" value="IPCR for {{ auth()->user()->designation->title ?? 'Faculty' }}" />
+                                            <button onclick="saveDocumentTitle()" class="text-blue-600 hover:text-blue-700 flex-shrink-0" title="Save title">
+                                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <p class="text-xs sm:text-sm text-gray-600">School Year: <span id="displaySchoolYear" class="font-semibold"></span></p>
+                                        <p class="text-xs sm:text-sm text-gray-600">Semester: <span id="displaySemester" class="font-semibold"></span></p>
                                     </div>
-                                    <button onclick="closeIpcrDocument()" class="text-gray-500 hover:text-gray-700">
+                                    <button onclick="closeIpcrDocument()" class="text-gray-500 hover:text-gray-700 ml-2 flex-shrink-0">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
                                     </button>
                                 </div>
-                                <div class="grid grid-cols-3 gap-4 text-sm">
-                                    <div>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm">
+                                    <div class="flex flex-col sm:block">
                                         <span class="text-gray-600">Ratee:</span>
-                                        <span class="font-semibold text-gray-900">{{ auth()->user()->name }}</span>
+                                        <span class="font-semibold text-gray-900 truncate">{{ auth()->user()->name }}</span>
                                     </div>
-                                    <div>
+                                    <div class="flex flex-col sm:block">
                                         <span class="text-gray-600">Approved By:</span>
-                                        <span class="font-semibold text-gray-900">{{ $directorUser ? $directorUser->name : 'N/A' }}</span>
+                                        <span class="font-semibold text-gray-900 truncate">{{ $directorUser ? $directorUser->name : 'N/A' }}</span>
                                     </div>
-                                    <div>
+                                    <div class="flex flex-col sm:block">
                                         <span class="text-gray-600">Noted By:</span>
-                                        <span class="font-semibold text-gray-900">{{ $deanUser ? $deanUser->name : 'N/A' }}</span>
+                                        <span class="font-semibold text-gray-900 truncate">{{ $deanUser ? $deanUser->name : 'N/A' }}</span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Excel-like Table -->
-                            <div class="overflow-x-auto px-6 py-4">
-                                <table class="w-full border-collapse">
+                            <div class="overflow-x-auto px-2 sm:px-6 py-3 sm:py-4">
+                                <table class="w-full border-collapse min-w-[800px]">
+                                    <thead>
+                                        <tr class="bg-gray-100">
+                                            <th class="border border-gray-300 px-3 py-2 text-xs font-bold text-gray-700" rowspan="2" style="width: 15%;">MFO</th>
+                                            <th class="border border-gray-300 px-3 py-2 text-xs font-bold text-gray-700" colspan="2" style="width: 25%;">Success Indicator</th>
+                                            <th class="border border-gray-300 px-3 py-2 text-xs font-bold text-gray-700 hidden" rowspan="2" style="width: 20%;">Actual Accomplishment</th>
+                                            <th class="border border-gray-300 px-3 py-2 text-xs font-bold text-gray-700 hidden" colspan="4">Rating</th>
+                                            <th class="border border-gray-300 px-3 py-2 text-xs font-bold text-gray-700 hidden" rowspan="2" style="width: 15%;">Remarks</th>
+                                        </tr>
+                                        <tr class="bg-gray-100">
+                                            <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-600">Target</th>
+                                            <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-600">Measures</th>
+                                            <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-600 hidden" style="width: 8%;">Q</th>
+                                            <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-600 hidden" style="width: 8%;">E</th>
+                                            <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-600 hidden" style="width: 8%;">T</th>
+                                            <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-600 hidden" style="width: 8%;">A</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ipcrTableBody">
+                                        <!-- Table rows will be added dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="px-2 sm:px-6 py-3 sm:py-4 bg-gray-50 border-t border-gray-300 sticky bottom-0 z-10">
+                                <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 sm:gap-3">
+                                    <div class="flex flex-wrap gap-2">
+                                        <!-- Dropdown for Add Section Header -->
+                                        <div class="relative" id="sectionHeaderDropdown">
+                                            <button type="button" onclick="toggleSectionHeaderDropdown()" class="px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 flex items-center gap-1 sm:gap-2 whitespace-nowrap">
+                                                <span class="hidden sm:inline">+</span> Add Section
+                                                <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                                </svg>
+                                            </button>
+                                            <div id="sectionHeaderDropdownMenu" class="hidden absolute left-0 bottom-full mb-2 w-48 sm:w-56 rounded-lg shadow-xl bg-white border border-gray-200 z-[9999]">
+                                                <div class="py-1">
+                                                    <button type="button" onclick="addSectionHeader('Strategic Objectives', false)" class="w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                                                        Strategic Objectives
+                                                    </button>
+                                                    <button type="button" onclick="addSectionHeader('Core Functions', false)" class="w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                                                        Core Functions
+                                                    </button>
+                                                    <button type="button" onclick="addSectionHeader('Support Function', false)" class="w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                                                        Support Function
+                                                    </button>
+                                                    <button type="button" onclick="addSectionHeader('', true)" class="w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 border-t border-gray-200">
+                                                        Others (Custom)
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" onclick="addSOHeader()" class="px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-purple-600 bg-purple-50 border border-purple-200 hover:bg-purple-100 whitespace-nowrap">
+                                            <span class="hidden sm:inline">+</span> Add SO
+                                        </button>
+                                        <button type="button" onclick="addDataRow()" class="px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-green-600 bg-green-50 border border-green-200 hover:bg-green-100 whitespace-nowrap">
+                                            <span class="hidden sm:inline">+</span> Add Row
+                                        </button>
+                                        <button type="button" onclick="removeLastRow()" class="px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 whitespace-nowrap">
+                                            <span class="hidden sm:inline">-</span> Remove
+                                        </button>
+                                    </div>
+                                    <div class="flex gap-2 sm:gap-3">
+                                        <button type="button" onclick="saveAsTemplate()" class="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-orange-700 bg-orange-50 border border-orange-300 hover:bg-orange-100 whitespace-nowrap">
+                                            <span class="hidden sm:inline">📋</span> Save as Template
+                                        </button>
+                                        <button type="button" onclick="closeIpcrDocument()" class="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50">Close</button>
+                                        <button type="button" onclick="saveIpcrDocument()" class="flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Template Preview Modal -->
+                    <div id="templatePreviewModal" class="fixed inset-0 z-50 hidden">
+                        <div class="absolute inset-0 bg-black/50" onclick="closeTemplatePreview()"></div>
+                        <div class="relative mx-auto mt-2 sm:mt-8 mb-2 sm:mb-8 w-full max-w-6xl bg-white rounded-lg sm:rounded-xl shadow-lg max-h-[98vh] sm:max-h-[90vh] overflow-y-auto px-2 sm:px-0">
+                            <!-- Document Header -->
+                            <div class="bg-gray-50 px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-300 sticky top-0 bg-white z-10">
+                                <div class="flex justify-between items-start mb-3 sm:mb-4">
+                                    <div class="flex-1 min-w-0">
+                                        <h2 id="templatePreviewTitle" class="text-sm sm:text-lg font-bold text-gray-900 mb-2"></h2>
+                                        <p class="text-xs sm:text-sm text-gray-600">School Year: <span id="templatePreviewSchoolYear" class="font-semibold"></span></p>
+                                        <p class="text-xs sm:text-sm text-gray-600">Semester: <span id="templatePreviewSemester" class="font-semibold"></span></p>
+                                    </div>
+                                    <button onclick="closeTemplatePreview()" class="text-gray-500 hover:text-gray-700 ml-2 flex-shrink-0">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm">
+                                    <div class="flex flex-col sm:block">
+                                        <span class="text-gray-600">Ratee:</span>
+                                        <span class="font-semibold text-gray-900 truncate">{{ auth()->user()->name }}</span>
+                                    </div>
+                                    <div class="flex flex-col sm:block">
+                                        <span class="text-gray-600">Approved By:</span>
+                                        <span class="font-semibold text-gray-900 truncate">{{ $directorUser ? $directorUser->name : 'N/A' }}</span>
+                                    </div>
+                                    <div class="flex flex-col sm:block">
+                                        <span class="text-gray-600">Noted By:</span>
+                                        <span class="font-semibold text-gray-900 truncate">{{ $deanUser ? $deanUser->name : 'N/A' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Excel-like Table -->
+                            <div class="overflow-x-auto px-2 sm:px-6 py-3 sm:py-4">
+                                <table class="w-full border-collapse min-w-[800px]">
                                     <thead>
                                         <tr class="bg-gray-100">
                                             <th class="border border-gray-300 px-3 py-2 text-xs font-bold text-gray-700" rowspan="2" style="width: 15%;">MFO</th>
@@ -382,72 +501,19 @@
                                             <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-600" style="width: 8%;">A</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="ipcrTableBody">
-                                        <!-- Strategic Objectives Section -->
-                                        <tr class="bg-blue-50">
-                                            <td colspan="9" class="border border-gray-300 px-3 py-2">
-                                                <input type="text" class="w-full bg-transparent border-0 focus:ring-0 font-bold text-gray-900" value="Strategic Objectives" />
-                                            </td>
-                                        </tr>
-                                        <tr class="bg-blue-100">
-                                            <td colspan="9" class="border border-gray-300 px-3 py-2">
-                                                <input type="text" class="w-full bg-transparent border-0 focus:ring-0 font-semibold text-gray-800" value="SO I: PROMOTING ACCESS TO QUALITY EDUCATION" />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="border border-gray-300 px-2 py-2">
-                                                <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0" placeholder="Enter MFO"></textarea>
-                                            </td>
-                                            <td class="border border-gray-300 px-2 py-2">
-                                                <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0" placeholder="Enter Target"></textarea>
-                                            </td>
-                                            <td class="border border-gray-300 px-2 py-2">
-                                                <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0"></textarea>
-                                            </td>
-                                            <td class="border border-gray-300 px-2 py-2">
-                                                <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0"></textarea>
-                                            </td>
-                                            <td class="border border-gray-300 px-2 py-2">
-                                                <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5">
-                                            </td>
-                                            <td class="border border-gray-300 px-2 py-2">
-                                                <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5">
-                                            </td>
-                                            <td class="border border-gray-300 px-2 py-2">
-                                                <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5">
-                                            </td>
-                                            <td class="border border-gray-300 px-2 py-2">
-                                                <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5">
-                                            </td>
-                                            <td class="border border-gray-300 px-2 py-2">
-                                                <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0"></textarea>
-                                            </td>
-                                            </td>
-                                        </tr>
+                                    <tbody id="templatePreviewTableBody">
+                                        <!-- Table rows will be added dynamically -->
                                     </tbody>
                                 </table>
                             </div>
 
                             <!-- Action Buttons -->
-                            <div class="px-6 py-4 bg-gray-50 border-t border-gray-300 flex justify-between items-center gap-3 sticky bottom-0">
-                                <div class="flex gap-3">
-                                    <button type="button" onclick="addSectionHeader()" class="px-4 py-2 rounded-lg text-sm font-semibold text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100">
-                                        + Add Section Header
-                                    </button>
-                                    <button type="button" onclick="addSOHeader()" class="px-4 py-2 rounded-lg text-sm font-semibold text-purple-600 bg-purple-50 border border-purple-200 hover:bg-purple-100">
-                                        + Add SO Header
-                                    </button>
-                                    <button type="button" onclick="addDataRow()" class="px-4 py-2 rounded-lg text-sm font-semibold text-green-600 bg-green-50 border border-green-200 hover:bg-green-100">
-                                        + Add Row
-                                    </button>
-                                    <button type="button" onclick="removeLastRow()" class="px-4 py-2 rounded-lg text-sm font-semibold text-red-600 bg-red-50 border border-red-200 hover:bg-red-100">
-                                        - Remove Last Row
-                                    </button>
+                            <div class="px-2 sm:px-6 py-3 sm:py-4 bg-gray-50 border-t border-gray-300 sticky bottom-0 z-10">
+                                <div class="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-2 sm:gap-3">
+                                    <button type="button" onclick="saveCopyFromPreview()" class="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-white bg-orange-600 hover:bg-orange-700">Save Copy</button>
+                                    <button type="button" onclick="closeTemplatePreview()" class="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50">Close</button>
                                 </div>
-                                <div class="flex gap-3">
-                                    <button type="button" onclick="closeIpcrDocument()" class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50">Close</button>
-                                    <button type="button" onclick="saveIpcrDocument()" class="px-6 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700">Save</button>
-                                </div>
+                                <input type="hidden" id="currentPreviewTemplateId" value="">
                             </div>
                         </div>
                     </div>
@@ -562,15 +628,38 @@
                                 <button onclick="deleteTemplate({{ $template->id }})" class="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full p-2 transition" title="Delete template">
                                     <i class="fas fa-trash text-sm"></i>
                                 </button>
-                                <div class="mb-3 pr-8">
-                                    <p class="text-sm sm:text-base font-semibold text-gray-900">{{ $template->title }}</p>
-                                    <p class="text-xs sm:text-sm text-gray-600">{{ $template->period }}</p>
-                                    <p class="text-xs text-gray-500">Saved on {{ $template->created_at->format('M d, Y') }}</p>
+                                <div class="mb-3 pr-8 flex items-start gap-3">
+                                    <div class="pt-1">
+                                        <input type="radio" 
+                                               name="activeTemplate" 
+                                               id="template_{{ $template->id }}" 
+                                               value="{{ $template->id }}"
+                                               {{ $template->is_active ? 'checked' : '' }}
+                                               onchange="setActiveTemplate({{ $template->id }})"
+                                               class="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                                    </div>
+                                    <div class="flex-1">
+                                        <label for="template_{{ $template->id }}" class="cursor-pointer">
+                                            <p class="text-sm sm:text-base font-semibold text-gray-900">{{ $template->title }}</p>
+                                            @if($template->school_year && $template->semester)
+                                                <p class="text-xs sm:text-sm text-gray-600">{{ $template->school_year }} • {{ $template->semester }}</p>
+                                            @else
+                                                <p class="text-xs sm:text-sm text-gray-600">{{ $template->period }}</p>
+                                            @endif
+                                            <p class="text-xs text-gray-500">Saved on {{ $template->created_at->format('M d, Y') }}</p>
+                                        </label>
+                                    </div>
                                 </div>
-                                <div class="flex gap-2">
-                                    <button onclick="loadTemplate({{ $template->id }})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold py-2 px-3 sm:px-4 rounded">
-                                        Edit
-                                    </button>
+                                <div class="flex gap-2 ml-7">
+                                    @if($template->table_body_html)
+                                        <button onclick="loadTemplateToDocument({{ $template->id }})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold py-2 px-3 sm:px-4 rounded">
+                                            Use
+                                        </button>
+                                    @else
+                                        <button onclick="loadTemplate({{ $template->id }})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold py-2 px-3 sm:px-4 rounded">
+                                            Edit
+                                        </button>
+                                    @endif
                                     <button onclick="viewTemplate({{ $template->id }})" class="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm font-semibold py-2 px-3 sm:px-4 rounded">
                                         View
                                     </button>
@@ -778,7 +867,6 @@
         let currentTemplateId = null;
         let currentSavedCopyId = null;
         const ipcrRoleLabel = @json(auth()->user()->designation->title ?? 'Faculty');
-        const savedCopiesKey = 'ipcrSavedCopies';
         const csrfToken = @json(csrf_token());
 
         function openCreateIpcrModal() {
@@ -803,6 +891,22 @@
             document.getElementById('displaySchoolYear').textContent = schoolYear;
             document.getElementById('displaySemester').textContent = semester === 'first' ? 'First Semester' : 'Second Semester';
             
+            // Clear table body and reset title
+            const tableBody = document.getElementById('ipcrTableBody');
+            if (tableBody) {
+                tableBody.innerHTML = '';
+            }
+            
+            // Reset document title
+            const titleInput = document.getElementById('ipcrDocumentTitle');
+            if (titleInput) {
+                titleInput.value = `IPCR for ${ipcrRoleLabel}`;
+            }
+            
+            // Reset saved copy ID and SO counter
+            currentSavedCopyId = null;
+            soHeaderCount = 0;
+            
             // Hide modal and create button
             closeCreateIpcrModal();
             document.getElementById('createButtonArea').style.display = 'none';
@@ -815,6 +919,13 @@
             document.getElementById('ipcrDocumentContainer').classList.add('hidden');
             document.getElementById('createButtonArea').style.display = 'flex';
             currentSavedCopyId = null;
+        }
+
+        function saveDocumentTitle() {
+            const titleInput = document.getElementById('ipcrDocumentTitle');
+            if (titleInput) {
+                showAlertModal('success', 'Title Updated', 'Document title has been updated. Remember to save your document to persist changes.');
+            }
         }
 
         function openIpcrFormModal() {
@@ -846,11 +957,11 @@
             }
         }
 
-        function populateSubmitSavedCopies() {
+        async function populateSubmitSavedCopies() {
             const select = document.getElementById('submitSavedCopySelect');
             if (!select) return;
 
-            const savedCopies = getSavedCopies();
+            const savedCopies = await getSavedCopies();
             select.innerHTML = '';
 
             if (savedCopies.length === 0) {
@@ -866,97 +977,225 @@
             savedCopies.forEach(copy => {
                 const option = document.createElement('option');
                 option.value = copy.id;
-                option.textContent = `${copy.title} • ${copy.schoolYear} • ${copy.semester}`;
+                option.textContent = `${copy.title} • ${copy.school_year} • ${copy.semester}`;
                 select.appendChild(option);
             });
         }
 
-        function submitSelectedCopy() {
+        async function submitSelectedCopy() {
             const select = document.getElementById('submitSavedCopySelect');
             const selectedId = select ? select.value : '';
             if (!selectedId) {
                 showAlertModal('warning', 'Select a Copy', 'Please select a saved copy to submit.');
                 return;
             }
-            const savedCopies = getSavedCopies();
-            const item = savedCopies.find(copy => String(copy.id) === String(selectedId));
-            if (!item) {
-                showAlertModal('error', 'Not Found', 'Selected saved copy could not be found.');
+            
+            try {
+                const response = await fetch(`{{ url('faculty/ipcr/saved-copies') }}/${selectedId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                if (!data.success) {
+                    showAlertModal('error', 'Not Found', 'Selected saved copy could not be found.');
+                    return;
+                }
+                
+                const item = data.savedCopy;
+
+                const submitResponse = await fetch('/faculty/ipcr/submissions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: item.title,
+                        school_year: item.school_year,
+                        semester: item.semester,
+                        table_body_html: item.table_body_html || ''
+                    })
+                });
+
+                if (!submitResponse.ok) {
+                    const submitData = await submitResponse.json().catch(() => ({}));
+                    throw new Error(submitData.message || 'Failed to submit IPCR');
+                }
+
+                closeSubmitIpcrModal();
+                showAlertModal('success', 'Submitted', 'Your IPCR has been submitted successfully.');
+            } catch (error) {
+                showAlertModal('error', 'Submit Failed', error.message || 'Failed to submit IPCR.');
+            }
+        }
+
+        function saveIpcrDocument() {
+            const schoolYear = document.getElementById('displaySchoolYear')?.textContent?.trim();
+            const semester = document.getElementById('displaySemester')?.textContent?.trim();
+            const titleInput = document.getElementById('ipcrDocumentTitle');
+            const title = titleInput ? titleInput.value.trim() : `IPCR for ${ipcrRoleLabel}`;
+            const tableBody = document.getElementById('ipcrTableBody');
+            const tableBodyHtml = tableBody ? buildTableBodySnapshot(tableBody) : '';
+
+            const payload = {
+                title: title,
+                school_year: schoolYear || 'N/A',
+                semester: semester || 'N/A',
+                table_body_html: tableBodyHtml
+            };
+
+            const url = currentSavedCopyId 
+                ? `{{ url('faculty/ipcr/saved-copies') }}/${currentSavedCopyId}` 
+                : '{{ route("faculty.ipcr.saved-copies.store") }}';
+            const method = currentSavedCopyId ? 'PUT' : 'POST';
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentSavedCopyId = data.savedCopy.id;
+                    renderSavedCopies();
+                    showAlertModal('success', 'Saved', data.message);
+                } else {
+                    showAlertModal('error', 'Error', data.message || 'Failed to save IPCR draft');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlertModal('error', 'Error', 'An error occurred while saving the IPCR draft.');
+            });
+        }
+
+        function extractSoCounts() {
+            const tableBody = document.getElementById('ipcrTableBody');
+            if (!tableBody) return { strategic_objectives: 0, core_functions: 0, support_functions: 0 };
+            
+            let counts = {
+                strategic_objectives: 0,
+                core_functions: 0,
+                support_functions: 0
+            };
+            
+            let currentSection = null;
+            const rows = tableBody.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const className = row.className;
+                
+                // Detect section headers
+                if (className.includes('bg-green-100')) {
+                    currentSection = 'strategic_objectives';
+                } else if (className.includes('bg-purple-100')) {
+                    currentSection = 'core_functions';
+                } else if (className.includes('bg-orange-100')) {
+                    currentSection = 'support_functions';
+                } else if (className.includes('bg-gray-100') && row.querySelector('td[colspan]')) {
+                    // Custom section (Others) - don't assign to any count
+                    currentSection = null;
+                }
+                
+                // Count SO headers (blue rows) under the current section
+                if (className.includes('bg-blue-100') && currentSection) {
+                    counts[currentSection]++;
+                }
+            });
+            
+            return counts;
+        }
+
+        function saveAsTemplate() {
+            const schoolYear = document.getElementById('displaySchoolYear')?.textContent?.trim();
+            const semester = document.getElementById('displaySemester')?.textContent?.trim();
+            const titleInput = document.getElementById('ipcrDocumentTitle');
+            const title = titleInput ? titleInput.value.trim() : `IPCR Template`;
+            const tableBody = document.getElementById('ipcrTableBody');
+            const tableBodyHtml = tableBody ? buildTableBodySnapshot(tableBody) : '';
+
+            if (!tableBodyHtml || tableBodyHtml.trim() === '') {
+                showAlertModal('warning', 'Empty Template', 'Please add some content before saving as a template.');
                 return;
             }
 
-            fetch('/faculty/ipcr/submissions', {
+            // Extract SO counts
+            const soCounts = extractSoCounts();
+
+            const payload = {
+                title: title,
+                school_year: schoolYear || 'N/A',
+                semester: semester || 'N/A',
+                table_body_html: tableBodyHtml,
+                so_count_json: soCounts
+            };
+
+            console.log('Saving template with counts:', soCounts);
+
+            fetch('{{ route("faculty.ipcr.templates.from-saved-copy") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({
-                    title: item.title,
-                    school_year: item.schoolYear,
-                    semester: item.semester,
-                    table_body_html: item.tableBodyHtml || ''
-                })
+                body: JSON.stringify(payload)
             })
-                .then(async response => {
-                    if (!response.ok) {
-                        const data = await response.json().catch(() => ({}));
-                        throw new Error(data.message || 'Failed to submit IPCR');
-                    }
-                    return response.json();
-                })
-                .then(() => {
-                    closeSubmitIpcrModal();
-                    showAlertModal('success', 'Submitted', 'Your IPCR has been submitted successfully.');
-                })
-                .catch(error => {
-                    showAlertModal('error', 'Submit Failed', error.message || 'Failed to submit IPCR.');
-                });
-        }
-
-        function saveIpcrDocument() {
-            const schoolYear = document.getElementById('displaySchoolYear')?.textContent?.trim();
-            const semester = document.getElementById('displaySemester')?.textContent?.trim();
-            const title = `Individual Performance Commitment and Review (IPCR) for ${ipcrRoleLabel}`;
-            const tableBody = document.getElementById('ipcrTableBody');
-            const tableBodyHtml = tableBody ? buildTableBodySnapshot(tableBody) : '';
-
-            const savedCopies = getSavedCopies();
-            const payload = {
-                id: currentSavedCopyId || Date.now(),
-                title,
-                schoolYear: schoolYear || 'N/A',
-                semester: semester || 'N/A',
-                tableBodyHtml,
-                savedAt: new Date().toISOString()
-            };
-
-            if (currentSavedCopyId) {
-                const index = savedCopies.findIndex(copy => copy.id === currentSavedCopyId);
-                if (index !== -1) {
-                    savedCopies.splice(index, 1);
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP ${response.status}: ${text}`);
+                    });
                 }
-            }
-
-            savedCopies.unshift(payload);
-            setSavedCopies(savedCopies);
-            renderSavedCopies();
-            showAlertModal('success', 'Saved', currentSavedCopyId ? 'Your IPCR draft was updated successfully.' : 'Your IPCR draft was saved successfully.');
-            currentSavedCopyId = payload.id;
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const message = data.updated 
+                        ? 'Your existing template has been updated with the new content.' 
+                        : 'Your IPCR has been saved as a template. You can find it in the Templates section.';
+                    const title = data.updated ? 'Template Updated' : 'Template Saved';
+                    
+                    showAlertModal('success', title, message, function() {
+                        location.reload();
+                    });
+                } else {
+                    showAlertModal('error', 'Error', data.message || 'Failed to save as template');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlertModal('error', 'Error', error.message || 'An error occurred while saving the template.');
+            });
         }
 
-        function getSavedCopies() {
+        async function getSavedCopies() {
             try {
-                const raw = localStorage.getItem(savedCopiesKey);
-                return raw ? JSON.parse(raw) : [];
+                const response = await fetch('{{ route("faculty.ipcr.saved-copies.index") }}', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                return data.success ? data.savedCopies : [];
             } catch (error) {
+                console.error('Error fetching saved copies:', error);
                 return [];
             }
-        }
-
-        function setSavedCopies(items) {
-            localStorage.setItem(savedCopiesKey, JSON.stringify(items));
         }
 
         function buildTableBodySnapshot(tableBody) {
@@ -979,12 +1218,12 @@
             return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
         }
 
-        function renderSavedCopies() {
+        async function renderSavedCopies() {
             const list = document.getElementById('savedCopiesList');
             const empty = document.getElementById('savedCopiesEmpty');
             if (!list || !empty) return;
 
-            const savedCopies = getSavedCopies();
+            const savedCopies = await getSavedCopies();
             list.innerHTML = '';
 
             if (savedCopies.length === 0) {
@@ -996,12 +1235,13 @@
             savedCopies.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'submission-card';
+                const savedDate = item.saved_at || item.created_at;
                 card.innerHTML = `
                     <div class="flex justify-between items-start gap-2">
                         <div class="flex-1 min-w-0">
                             <p class="text-xs sm:text-sm font-semibold text-gray-900">${item.title}</p>
-                            <p class="text-xs text-gray-500 mt-1">${item.schoolYear} • ${item.semester}</p>
-                            <p class="text-xs text-gray-500 mt-1">Saved on ${formatSavedDate(item.savedAt)}</p>
+                            <p class="text-xs text-gray-500 mt-1">${item.school_year} • ${item.semester}</p>
+                            <p class="text-xs text-gray-500 mt-1">Saved on ${formatSavedDate(savedDate)}</p>
                         </div>
                         <div class="flex gap-2 flex-shrink-0">
                             <button class="text-blue-600 hover:text-blue-700 font-semibold text-xs sm:text-sm" onclick="editSavedCopy(${item.id})">View</button>
@@ -1014,14 +1254,40 @@
         }
 
         function deleteSavedCopy(id) {
-            const savedCopies = getSavedCopies();
-            const filtered = savedCopies.filter(copy => copy.id !== id);
-            setSavedCopies(filtered);
-            if (currentSavedCopyId === id) {
-                currentSavedCopyId = null;
-            }
-            renderSavedCopies();
-            showAlertModal('success', 'Deleted', 'Saved copy deleted successfully.');
+            openConfirmationModal(
+                'Delete Saved Copy',
+                'Are you sure you want to delete this saved copy?',
+                'This action cannot be undone.',
+                'danger',
+                'Delete',
+                function() {
+                    fetch(`{{ url('faculty/ipcr/saved-copies') }}/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (currentSavedCopyId === id) {
+                                currentSavedCopyId = null;
+                            }
+                            showAlertModal('success', 'Deleted', 'Saved copy deleted successfully!', function() {
+                                renderSavedCopies();
+                            });
+                        } else {
+                            showAlertModal('error', 'Error', data.message || 'Failed to delete saved copy');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showAlertModal('error', 'Error', 'An error occurred while deleting the saved copy.');
+                    });
+                }
+            );
         }
 
         function updateSoHeaderCountFromTable() {
@@ -1039,48 +1305,181 @@
             soHeaderCount = Math.max(1, count);
         }
 
+        function unhideTableColumns() {
+            // Unhide table headers
+            const headers = document.querySelectorAll('#ipcrDocumentContainer thead th.hidden');
+            headers.forEach(header => header.classList.remove('hidden'));
+            
+            // Unhide table body cells
+            const cells = document.querySelectorAll('#ipcrTableBody td.hidden');
+            cells.forEach(cell => cell.classList.remove('hidden'));
+        }
+        
         function editSavedCopy(id) {
-            const savedCopies = getSavedCopies();
-            const item = savedCopies.find(copy => copy.id === id);
-            if (!item) {
-                showAlertModal('error', 'Not Found', 'Saved copy could not be found.');
-                return;
-            }
+            fetch(`{{ url('faculty/ipcr/saved-copies') }}/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const item = data.savedCopy;
+                    const tableBody = document.getElementById('ipcrTableBody');
+                    if (tableBody && item.table_body_html) {
+                        tableBody.innerHTML = item.table_body_html;
+                        
+                        // Unhide columns for saved copy
+                        unhideTableColumns();
+                    }
 
-            const tableBody = document.getElementById('ipcrTableBody');
-            if (tableBody && item.tableBodyHtml) {
-                tableBody.innerHTML = item.tableBodyHtml;
-            }
+                    // Load title
+                    const titleInput = document.getElementById('ipcrDocumentTitle');
+                    if (titleInput && item.title) {
+                        titleInput.value = item.title;
+                    }
 
-            if (item.schoolYear) {
-                const displaySchoolYear = document.getElementById('displaySchoolYear');
-                if (displaySchoolYear) displaySchoolYear.textContent = item.schoolYear;
-            }
-            if (item.semester) {
-                const displaySemester = document.getElementById('displaySemester');
-                if (displaySemester) displaySemester.textContent = item.semester;
-            }
+                    if (item.school_year) {
+                        const displaySchoolYear = document.getElementById('displaySchoolYear');
+                        if (displaySchoolYear) displaySchoolYear.textContent = item.school_year;
+                    }
+                    if (item.semester) {
+                        const displaySemester = document.getElementById('displaySemester');
+                        if (displaySemester) displaySemester.textContent = item.semester;
+                    }
 
-            updateSoHeaderCountFromTable();
-            currentSavedCopyId = item.id;
-            document.getElementById('createButtonArea').style.display = 'none';
-            document.getElementById('ipcrDocumentContainer').classList.remove('hidden');
+                    updateSoHeaderCountFromTable();
+                    currentSavedCopyId = item.id;
+                    document.getElementById('createButtonArea').style.display = 'none';
+                    document.getElementById('ipcrDocumentContainer').classList.remove('hidden');
+                } else {
+                    showAlertModal('error', 'Not Found', 'Saved copy could not be found.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlertModal('error', 'Error', 'An error occurred while loading the saved copy.');
+            });
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             renderSavedCopies();
         });
 
-        function addSectionHeader() {
+        function addSectionHeader(headerText = '', isEditable = true) {
             const tableBody = document.getElementById('ipcrTableBody');
             if (!tableBody) return;
             
+            // Close dropdown after selection
+            toggleSectionHeaderDropdown();
+            
+            // Reset SO counter for non-custom sections
+            if (!isEditable) {
+                soHeaderCount = 0;
+            }
+            
+            // Determine color based on section type
+            let bgColor = 'bg-gray-100'; // Default for custom/others
+            if (!isEditable) {
+                if (headerText === 'Strategic Objectives') {
+                    bgColor = 'bg-green-100';
+                } else if (headerText === 'Core Functions') {
+                    bgColor = 'bg-purple-100';
+                } else if (headerText === 'Support Function') {
+                    bgColor = 'bg-orange-100';
+                }
+            }
+            
             // Create new section header row
+            const newRow = document.createElement('tr');
+            newRow.className = bgColor;
+            
+            if (isEditable) {
+                // Editable section header (Others/Custom)
+                newRow.innerHTML = `
+                    <td colspan="9" class="border border-gray-300 px-3 py-2 font-semibold text-gray-800">
+                        <input type="text" class="w-full bg-transparent border-0 focus:ring-0 font-semibold text-gray-800" placeholder="Enter custom section header..." value="${headerText}" />
+                    </td>
+                `;
+            } else {
+                // Non-editable section header (predefined sections)
+                newRow.innerHTML = `
+                    <td colspan="9" class="border border-gray-300 px-3 py-2 font-semibold text-gray-800">
+                        <div class="font-semibold text-gray-800">${headerText}</div>
+                        <input type="hidden" value="${headerText}" />
+                    </td>
+                `;
+                // Track section type for future development
+                newRow.setAttribute('data-section-type', headerText.toLowerCase().replace(/\s+/g, '-'));
+            }
+            
+            // Append to table
+            tableBody.appendChild(newRow);
+        }
+        
+        function toggleSectionHeaderDropdown() {
+            const dropdown = document.getElementById('sectionHeaderDropdownMenu');
+            if (!dropdown) return;
+            
+            dropdown.classList.toggle('hidden');
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('sectionHeaderDropdown');
+            const dropdownMenu = document.getElementById('sectionHeaderDropdownMenu');
+            
+            if (dropdown && dropdownMenu && !dropdown.contains(event.target)) {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+
+        function addSOHeader() {
+            const tableBody = document.getElementById('ipcrTableBody');
+            if (!tableBody) return;
+            
+            // Find the last section header (green, purple, or orange background)
+            const allRows = tableBody.querySelectorAll('tr');
+            let lastSectionIndex = -1;
+            
+            for (let i = allRows.length - 1; i >= 0; i--) {
+                const row = allRows[i];
+                if (row.classList.contains('bg-green-100') || 
+                    row.classList.contains('bg-purple-100') || 
+                    row.classList.contains('bg-orange-100')) {
+                    lastSectionIndex = i;
+                    break;
+                }
+            }
+            
+            // Count existing SO headers after the last section header
+            let currentSOCount = 0;
+            for (let i = lastSectionIndex + 1; i < allRows.length; i++) {
+                const row = allRows[i];
+                if (row.classList.contains('bg-blue-100')) {
+                    const span = row.querySelector('span.font-semibold.text-gray-800');
+                    if (span && span.textContent.includes('SO')) {
+                        currentSOCount++;
+                    }
+                }
+            }
+            
+            // Set next SO number
+            const nextSONumber = currentSOCount + 1;
+            const soLabel = convertToRoman(nextSONumber);
+            
+            // Create new SO header row
             const newRow = document.createElement('tr');
             newRow.className = 'bg-blue-100';
             newRow.innerHTML = `
                 <td colspan="9" class="border border-gray-300 px-3 py-2 font-semibold text-gray-800">
-                    <input type="text" class="w-full bg-transparent border-0 focus:ring-0 font-semibold text-gray-800" placeholder="Enter section header..." value="Strategic objectives" />
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold text-gray-800">SO ${soLabel}:</span>
+                        <input type="text" class="flex-1 bg-transparent border-0 focus:ring-0 font-semibold text-gray-800" placeholder="Enter SO description..." value="" />
+                    </div>
                 </td>
             `;
             
@@ -1088,26 +1487,32 @@
             tableBody.appendChild(newRow);
         }
 
-        function addSOHeader() {
-            const tableBody = document.getElementById('ipcrTableBody');
-            if (!tableBody) return;
+        // Convert number to Roman numeral
+        function convertToRoman(num) {
+            const romanNumerals = [
+                { value: 1000, numeral: 'M' },
+                { value: 900, numeral: 'CM' },
+                { value: 500, numeral: 'D' },
+                { value: 400, numeral: 'CD' },
+                { value: 100, numeral: 'C' },
+                { value: 90, numeral: 'XC' },
+                { value: 50, numeral: 'L' },
+                { value: 40, numeral: 'XL' },
+                { value: 10, numeral: 'X' },
+                { value: 9, numeral: 'IX' },
+                { value: 5, numeral: 'V' },
+                { value: 4, numeral: 'IV' },
+                { value: 1, numeral: 'I' }
+            ];
             
-            soHeaderCount++;
-            const soNumber = this.soHeaderCount || soHeaderCount;
-            const romanNumerals = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
-            const soLabel = romanNumerals[soHeaderCount] || 'SO ' + soHeaderCount;
-            
-            // Create new SO header row
-            const newRow = document.createElement('tr');
-            newRow.className = 'bg-blue-100';
-            newRow.innerHTML = `
-                <td colspan="9" class="border border-gray-300 px-3 py-2 font-semibold text-gray-800">
-                    <input type="text" class="w-full bg-transparent border-0 focus:ring-0 font-semibold text-gray-800" placeholder="Enter SO description..." value="SO ${soLabel}: YOUR SO DESCRIPTION HERE" />
-                </td>
-            `;
-            
-            // Append to table
-            tableBody.appendChild(newRow);
+            let result = '';
+            for (let i = 0; i < romanNumerals.length; i++) {
+                while (num >= romanNumerals[i].value) {
+                    result += romanNumerals[i].numeral;
+                    num -= romanNumerals[i].value;
+                }
+            }
+            return result;
         }
 
         function addDataRow() {
@@ -1126,22 +1531,22 @@
                 <td class="border border-gray-300 px-2 py-2">
                     <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0"></textarea>
                 </td>
-                <td class="border border-gray-300 px-2 py-2">
+                <td class="border border-gray-300 px-2 py-2 hidden">
                     <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0"></textarea>
                 </td>
-                <td class="border border-gray-300 px-2 py-2">
+                <td class="border border-gray-300 px-2 py-2 hidden">
                     <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5" value="">
                 </td>
-                <td class="border border-gray-300 px-2 py-2">
+                <td class="border border-gray-300 px-2 py-2 hidden">
                     <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5" value="">
                 </td>
-                <td class="border border-gray-300 px-2 py-2">
+                <td class="border border-gray-300 px-2 py-2 hidden">
                     <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5" value="">
                 </td>
-                <td class="border border-gray-300 px-2 py-2">
+                <td class="border border-gray-300 px-2 py-2 hidden">
                     <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="0" max="5" value="">
                 </td>
-                <td class="border border-gray-300 px-2 py-2">
+                <td class="border border-gray-300 px-2 py-2 hidden">
                     <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0"></textarea>
                 </td>
             `;
@@ -1214,15 +1619,7 @@
             // Remove the last row in the table body
             const rows = tableBody.querySelectorAll('tr');
             if (rows.length > 0) {
-                const lastRow = rows[rows.length - 1];
-                // Check if it's a SO header and decrement counter
-                if (lastRow.classList.contains('bg-blue-100')) {
-                    const input = lastRow.querySelector('input[type="text"]');
-                    if (input && input.value.includes('SO')) {
-                        soHeaderCount--;
-                    }
-                }
-                lastRow.remove();
+                rows[rows.length - 1].remove();
             }
         }
 
@@ -1593,6 +1990,67 @@
                 showAlertModal('error', 'Error', 'An error occurred while saving the IPCR template.');
             });
         }
+
+        function loadTemplateToDocument(templateId) {
+            fetch(`{{ url('faculty/ipcr/templates') }}/${templateId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const template = data.template;
+                    
+                    // Check if template has table_body_html
+                    if (template.table_body_html) {
+                        const tableBody = document.getElementById('templatePreviewTableBody');
+                        if (tableBody) {
+                            tableBody.innerHTML = template.table_body_html;
+                        }
+
+                        // Load title
+                        const titleElement = document.getElementById('templatePreviewTitle');
+                        if (titleElement && template.title) {
+                            titleElement.textContent = template.title;
+                        }
+
+                        // Load school year and semester
+                        if (template.school_year) {
+                            const displaySchoolYear = document.getElementById('templatePreviewSchoolYear');
+                            if (displaySchoolYear) displaySchoolYear.textContent = template.school_year;
+                        }
+                        if (template.semester) {
+                            const displaySemester = document.getElementById('templatePreviewSemester');
+                            if (displaySemester) displaySemester.textContent = template.semester;
+                        }
+
+                        // Store template ID for save copy functionality
+                        const templateIdField = document.getElementById('currentPreviewTemplateId');
+                        if (templateIdField) {
+                            templateIdField.value = templateId;
+                        }
+
+                        document.getElementById('templatePreviewModal').classList.remove('hidden');
+                    } else {
+                        showAlertModal('info', 'Legacy Template', 'This template was created with the old format. Please use the Edit button to modify it.');
+                    }
+                } else {
+                    showAlertModal('error', 'Not Found', 'Template could not be found.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlertModal('error', 'Error', 'An error occurred while loading the template.');
+            });
+        }
+        
+        function closeTemplatePreview() {
+            document.getElementById('templatePreviewModal').classList.add('hidden');
+        }
         
         function loadTemplate(templateId) {
             fetch(`{{ url('faculty/ipcr/templates') }}/${templateId}`)
@@ -1839,6 +2297,72 @@
             );
         }
         
+        function setActiveTemplate(templateId) {
+            fetch(`{{ url('faculty/ipcr/templates') }}/${templateId}/set-active`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Template set as active');
+                    // Reload to update dashboard counts
+                    setTimeout(() => {
+                        location.reload();
+                    }, 500);
+                } else {
+                    showAlertModal('error', 'Error', data.message || 'Failed to set template as active');
+                    // Reload to reset radio button state
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlertModal('error', 'Error', 'An error occurred while setting the active template.');
+                location.reload();
+            });
+        }
+
+        function saveCopyFromTemplate(templateId) {
+            fetch(`{{ url('faculty/ipcr/templates') }}/${templateId}/save-copy`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlertModal('success', 'Success', 'Template saved to Saved Copy successfully');
+                    // Close preview modal
+                    closeTemplatePreview();
+                    // Refresh saved copies list
+                    renderSavedCopies();
+                } else {
+                    showAlertModal('error', 'Error', data.message || 'Failed to save copy');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlertModal('error', 'Error', 'An error occurred while saving the copy.');
+            });
+        }
+
+        function saveCopyFromPreview() {
+            const templateIdField = document.getElementById('currentPreviewTemplateId');
+            if (!templateIdField || !templateIdField.value) {
+                showAlertModal('error', 'Error', 'No template selected');
+                return;
+            }
+            saveCopyFromTemplate(templateIdField.value);
+        }
+        
         function openConfirmationModal(title, message, subMessage, type, confirmText, callback) {
             const modal = document.getElementById('confirmationModal');
             const modalHeader = document.getElementById('modalHeader');
@@ -1935,7 +2459,53 @@
         
         // View template (placeholder for future implementation)
         function viewTemplate(templateId) {
-            showAlertModal('info', 'Coming Soon', 'View functionality will be implemented soon.');
+            fetch(`{{ url('faculty/ipcr/templates') }}/${templateId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const template = data.template;
+                        
+                        // Check if template has table_body_html
+                        if (template.table_body_html) {
+                            const tableBody = document.getElementById('templatePreviewTableBody');
+                            if (tableBody) {
+                                tableBody.innerHTML = template.table_body_html;
+                            }
+
+                            // Load title
+                            const titleElement = document.getElementById('templatePreviewTitle');
+                            if (titleElement && template.title) {
+                                titleElement.textContent = template.title;
+                            }
+
+                            // Load school year and semester
+                            if (template.school_year) {
+                                const displaySchoolYear = document.getElementById('templatePreviewSchoolYear');
+                                if (displaySchoolYear) displaySchoolYear.textContent = template.school_year;
+                            }
+                            if (template.semester) {
+                                const displaySemester = document.getElementById('templatePreviewSemester');
+                                if (displaySemester) displaySemester.textContent = template.semester;
+                            }
+
+                            // Store template ID for save copy functionality
+                            const templateIdField = document.getElementById('currentPreviewTemplateId');
+                            if (templateIdField) {
+                                templateIdField.value = templateId;
+                            }
+
+                            document.getElementById('templatePreviewModal').classList.remove('hidden');
+                        } else {
+                            showAlertModal('info', 'Legacy Template', 'This template was created with the old format. Please use the Edit button to modify it.');
+                        }
+                    } else {
+                        showAlertModal('error', 'Not Found', 'Template could not be found.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlertModal('error', 'Error', 'An error occurred while loading the template.');
+                });
         }
         
         // Alert Modal Functions

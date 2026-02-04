@@ -17,7 +17,74 @@ A comprehensive Individual Performance Commitment and Review (IPCR) management s
 - ⚡ **Vite Asset Bundling** with optimized CSS/JS
 - 🎨 **Tailwind CSS v4.0** for modern styling
 
-## 📦 Latest Updates (February 4, 2026)
+## 📦 Latest Updates (February 5, 2026)
+
+### 📊 Dashboard Analytics & SO Tracking (February 5, 2026)
+- ✨ **Strategic Objectives Counter** - Automatically counts SOs from active template per section
+- 📈 **Dynamic Progress Tracking** - Dashboard shows accomplished/total ratio (e.g., 0/3, 1/3)
+- 🔢 **Smart Percentage Calculation** - Auto-calculates completion rates (0/3 = 0%, 1/3 = 33%)
+- 📊 **N/A Display Logic** - Shows "N/A" when no template is active (0/0 scenario)
+- 🎯 **Section-wise Metrics** - Separate tracking for Strategic Objectives, Core Functions, Support Functions
+- 💾 **JSON Storage** - SO counts stored in database for faster retrieval
+- 🔄 **Auto-sync with Template** - Dashboard updates automatically when template is set as active
+
+### 🎨 Template Management Enhancements (February 5, 2026)
+- ✅ **SO Numbering Fix** - Roman numerals now increment correctly (I, II, III... XVI, XVII...)
+- 🔁 **Section Reset Logic** - SO numbering resets when starting a new section
+- ♾️ **Unlimited Roman Numerals** - Support for any number beyond XV using conversion algorithm
+- 💾 **Save Copy Feature** - Save templates as drafts in "Saved Copy" section from preview modal
+- 🎯 **Preview Modal Integration** - "Save Copy" button available when viewing templates
+- 📋 **Draft Management** - Saved copies appear in dedicated section, separate from templates
+- 🗂️ **Copy vs Template** - Clear distinction between reusable templates and working drafts
+
+### ⚡ Build System Optimization (February 5, 2026)
+- 📦 **Code Extraction** - Moved inline CSS/JS from 5 blade files to external assets
+- 🎨 **New CSS Files Added:**
+  - `resources/css/auth_verify-code.css` - Code input styling and animations
+  - `resources/css/auth_reset-password.css` - Password reset form styling
+  - `resources/css/admin_users_create.css` - Create user page styles
+- 📜 **New JS Files Added:**
+  - `resources/js/auth_verify-code.js` - Verification code input handling
+  - `resources/js/auth_reset-password.js` - Password toggle functionality
+  - `resources/js/admin_users_create.js` - User creation form interactions
+- 🔧 **Vite Configuration** - Updated to bundle 23 total assets (6 new files)
+- 📦 **Optimized Builds** - All assets now properly minified and cache-busted
+- ✅ **Clean Blade Templates** - Removed ~200+ lines of inline code across 5 files
+
+### 🗄️ Database Schema Updates (February 5, 2026)
+- 📊 **SO Count JSON Column** - Added `so_count_json` to `ipcr_templates` table
+- 🔄 **Auto-casting** - Configured Eloquent to auto-convert JSON to array
+- 💾 **Migration Created** - `2026_02_05_000213_add_so_count_json_to_ipcr_templates_table.php`
+- 📈 **Data Structure:**
+  ```json
+  {
+    "strategic_objectives": 3,
+    "core_functions": 3,
+    "support_functions": 3
+  }
+  ```
+
+### 🐛 Bug Fixes (February 5, 2026)
+- ✅ Fixed SO numbering increment glitch (no longer jumps from SO I to SO III after removal)
+- ✅ Fixed percentage display showing 100% when it should be 0%
+- ✅ Fixed template preview showing "Coming Soon" message
+- ✅ Fixed Save Copy duplicating templates instead of creating drafts
+- ✅ Fixed sidebar toggle function compatibility across different blade files
+- ✅ Removed unused `soHeaderCount` variable dependencies
+
+## 📦 Previous Updates
+
+### 🔐 Enhanced Password Reset Workflow (February 4, 2026)
+- ✨ **3-Step Verification Process** - Email entry → Code verification → New password
+- 🎯 **Modern Code Input UI** - Individual digit boxes with smooth animations and transitions
+- ⌨️ **Smart Input Handling** - Auto-advance on digit entry, backspace navigation, arrow key support
+- 📋 **Clipboard Integration** - Automatic paste detection and code distribution
+- 🎨 **Real-time Visual States** - Empty, focused, filled, and error states with color indicators
+- ⏲️ **Intelligent Resend Control** - 60-second countdown timer prevents spam
+- ✅ **Verified Badge** - Shows verified email on password reset form
+- 🔒 **Session-based Flow** - Ensures users complete verification before password reset
+- 📱 **Mobile Optimized** - Touch-friendly input boxes with numeric keyboard support
+- 🌐 **Consistent Branding** - URS logo favicon on all authentication pages
 
 ### 🔐 Password Reset Feature (NEW!)
 - 📧 **Email-based Password Reset** - Users can reset forgotten passwords via email verification
@@ -30,6 +97,11 @@ A comprehensive Individual Performance Commitment and Review (IPCR) management s
 - 🌐 **Accessible from Login** - "Forgot password?" link available on all login pages
 - 📱 **Responsive Forms** - Mobile-friendly forgot password and reset password pages
 - 🚀 **Free Tier Support** - 300 emails/day with Brevo's free plan
+- 🎯 **Interactive Verification UI** - Modern 6-box code input with auto-focus and auto-submit
+- 📋 **Paste Support** - Automatic code distribution across input boxes when pasting
+- ⏲️ **Resend Timer** - 60-second cooldown before allowing code resend
+- ✨ **Visual Feedback** - Shake animation on error, filled state indicators
+- 🎨 **Favicon Support** - URS logo favicon displayed on all pages
 
 ### ✨ Image Crop & Resize Feature
 - 🎬 **Interactive Crop Modal** - Draggable crop area with 1:1 aspect ratio constraint
@@ -82,21 +154,39 @@ A comprehensive Individual Performance Commitment and Review (IPCR) management s
 - `resources/css/dashboard_faculty_profile.css`
 - `resources/css/dashboard_faculty_my-ipcrs.css`
 
-**JS Files Created (8):**
+**JS Files Created (11):**
 - `resources/js/admin_users_edit.js`
 - `resources/js/admin_users_index.js`
 - `resources/js/admin_users_show.js`
+- `resources/js/admin_users_create.js` *(NEW)*
 - `resources/js/auth_login.js`
+- `resources/js/auth_verify-code.js` *(NEW)*
+- `resources/js/auth_reset-password.js` *(NEW)*
 - `resources/js/dashboard_admin_index.js`
 - `resources/js/dashboard_faculty_index.js`
 - `resources/js/dashboard_faculty_profile.js`
 - `resources/js/dashboard_faculty_my-ipcrs.js`
 
+**CSS Files Created (12):**
+- `resources/css/admin_users_edit.css`
+- `resources/css/admin_users_index.css`
+- `resources/css/admin_users_show.css`
+- `resources/css/admin_users_create.css` *(NEW)*
+- `resources/css/auth_login.css`
+- `resources/css/auth_login-selection.css`
+- `resources/css/auth_verify-code.css` *(NEW)*
+- `resources/css/auth_reset-password.css` *(NEW)*
+- `resources/css/dashboard_admin_index.css`
+- `resources/css/dashboard_faculty_index.css`
+- `resources/css/dashboard_faculty_profile.css`
+- `resources/css/dashboard_faculty_my-ipcrs.css`
+
 ### Technical Improvements
-- 🔧 **vite.config.js** - Configured with 17 entry points
+- 🔧 **vite.config.js** - Configured with 23 entry points
 - 🔧 **window.function** pattern - All interactive functions exposed globally
 - 🔧 **@vite directive** - All blade files now use Laravel Vite plugin
 - 🔧 **Build optimization** - Assets reduced from ~200KB to gzipped builds
+- 🔧 **Blade templates cleaned** - Removed ~200+ lines of inline code
 
 ### UI/UX Enhancements
 - 🎨 **Split-Screen Login Design** - Modern login page with title on left, form on right

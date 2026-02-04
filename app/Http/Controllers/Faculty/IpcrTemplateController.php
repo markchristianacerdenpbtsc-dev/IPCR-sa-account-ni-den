@@ -180,4 +180,130 @@ class IpcrTemplateController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Store a template from a saved copy.
+     */
+    public function storeFromSavedCopy(Request $request)
+    {
+        try {
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'school_year' => 'nullable|string|max:255',
+                'semester' => 'nullable|string|max:255',
+                'table_body_html' => 'required|string',
+                'so_count_json' => 'nullable|array',
+            ]);
+
+            // Check if template with exact same title exists (case-sensitive)
+            $existingTemplate = IpcrTemplate::where('user_id', Auth::id())
+                ->whereRaw('BINARY title = ?', [$request->title])
+                ->first();
+
+            if ($existingTemplate) {
+                // Update existing template
+                $existingTemplate->update([
+                    'school_year' => $request->school_year,
+                    'semester' => $request->semester,
+                    'period' => $request->school_year ? $request->school_year : 'N/A',
+                    'table_body_html' => $request->table_body_html,
+                    'so_count_json' => $request->so_count_json,
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Template updated successfully',
+                    'template' => $existingTemplate,
+                    'updated' => true,
+                ]);
+            }
+
+            // Create new template if no match found
+            $template = IpcrTemplate::create([
+                'user_id' => Auth::id(),
+                'title' => $request->title,
+                'period' => $request->school_year ? $request->school_year : 'N/A',
+                'school_year' => $request->school_year,
+                'semester' => $request->semester,
+                'content' => json_encode([]),
+                'table_body_html' => $request->table_body_html,
+                'so_count_json' => $request->so_count_json,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Template saved successfully',
+                'template' => $template,
+                'updated' => false,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('IPCR Store From Saved Copy Error', ['message' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to save template: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Set a template as active.
+     */
+    public function setActive($id)
+    {
+        try {
+            // First, set all user's templates to inactive
+            IpcrTemplate::where('user_id', Auth::id())
+                ->update(['is_active' => false]);
+
+            // Then set the selected template as active
+            $template = IpcrTemplate::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
+
+            $template->update(['is_active' => true]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Template set as active successfully',
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('IPCR Set Active Error', ['message' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to set template as active: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function saveCopy($id)
+    {
+        try {
+            // Find the template
+            $template = IpcrTemplate::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
+
+            // Create a saved copy (draft) from the template
+            $savedCopy = \App\Models\IpcrSavedCopy::create([
+                'user_id' => Auth::id(),
+                'title' => $template->title,
+                'school_year' => $template->school_year,
+                'semester' => $template->semester,
+                'table_body_html' => $template->table_body_html,
+                'saved_at' => now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Template saved to Saved Copy successfully',
+                'saved_copy_id' => $savedCopy->id,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('IPCR Save Copy Error', ['message' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to save copy: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }

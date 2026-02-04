@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create User - Admin Dashboard</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/urs_logo.jpg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    @vite(['resources/css/admin_users_create.css', 'resources/js/admin_users_create.js'])
 </head>
 <body class="bg-gray-50">
     <!-- Navigation -->
@@ -212,24 +214,5 @@
             </form>
         </div>
     </div>
-    
-    <script>
-        // Toggle password visibility
-        function togglePasswordVisibility(fieldId) {
-            const input = document.getElementById(fieldId);
-            const eyeOpen = document.getElementById(fieldId + '_eye_open');
-            const eyeClosed = document.getElementById(fieldId + '_eye_closed');
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                eyeOpen.classList.add('hidden');
-                eyeClosed.classList.remove('hidden');
-            } else {
-                input.type = 'password';
-                eyeOpen.classList.remove('hidden');
-                eyeClosed.classList.add('hidden');
-            }
-        }
-    </script>
 </body>
 </html>

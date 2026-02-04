@@ -152,7 +152,8 @@ php artisan migrate
 **Note:** This will create all necessary tables including:
 - users, departments, designations, user_roles
 - sessions, cache, password_reset_tokens
-- user_photos, ipcr_templates, ipcr_submissions
+- user_photos, ipcr_templates, ipcr_submissions, ipcr_saved_copies
+- **Template Analytics:** `so_count_json` column in `ipcr_templates` for tracking SO counts
 
 ---
 
@@ -201,6 +202,51 @@ Place your logo as `public/images/urs_logo.jpg` (optional)
 
 ---
 
+### Step 9️⃣ Password Reset Configuration (Email Setup)
+
+The system includes a password reset feature with 6-digit verification codes. To enable email sending:
+
+**Brevo (Sendinblue) Configuration:**
+
+1. **Create free Brevo account:** https://www.brevo.com/
+2. **Get SMTP credentials:**
+   - Go to Settings → SMTP & API
+   - Create new SMTP key
+   - Copy the credentials
+
+3. **Update `.env` file:**
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp-relay.brevo.com
+MAIL_PORT=587
+MAIL_USERNAME=your_brevo_email@example.com
+MAIL_PASSWORD=your_brevo_smtp_key
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="noreply@ursipcr.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+**Password Reset Features:**
+- 📧 Users receive 6-digit codes via email
+- ⏱️ Codes expire after 15 minutes
+- 🎯 Interactive UI with individual digit input boxes
+- 📋 Paste support for copying codes
+- ⏲️ 60-second cooldown for resending codes
+- ✅ Email verification before password reset
+
+**Free Tier Limits:**
+- 300 emails per day
+- Perfect for development and small deployments
+
+**Testing:**
+```bash
+php artisan tinker
+>>> Illuminate\Support\Facades\Mail::raw('Test email', function($msg) { $msg->to('test@example.com')->subject('Test'); });
+```
+
+---
+
 ### Step 9️⃣ Build Frontend Assets
 
 ```bash
@@ -208,6 +254,17 @@ npm run build
 ```
 
 ⚠️ **This step is mandatory before running the application!**
+
+**What gets built:**
+- 23 optimized asset bundles (CSS + JS)
+- Minified and cache-busted files
+- Production-ready builds with gzip compression
+
+**Asset breakdown:**
+- Auth pages: login, verify-code, reset-password, login-selection (6 files)
+- Dashboard: faculty index/profile/my-ipcrs, admin index (8 files)
+- Admin users: index, show, edit, create (8 files)
+- Additional: 1 manifest.json file
 
 ---
 
@@ -347,7 +404,71 @@ php artisan serve
 
 ---
 
-## 🔧 Troubleshooting
+## � Dashboard Features & Template Management
+
+### Faculty Dashboard Analytics
+
+The faculty dashboard provides real-time performance tracking:
+
+**Performance Metrics:**
+- **Strategic Objectives Progress:** Shows accomplished/total (e.g., 0/3, 1/3, 2/3)
+- **Core Functions Progress:** Tracks completion per SO
+- **Support Functions Progress:** Monitors support activities
+- **Smart Percentages:** Auto-calculates (0/3 = 0%, 1/3 = 33%, 2/3 = 67%, 3/3 = 100%)
+- **N/A Display:** Shows "N/A" when no template is active
+
+**How it works:**
+1. Create an IPCR template with SO entries
+2. Click "Save as Template"
+3. Set template as "Active" (radio button)
+4. Dashboard automatically syncs and displays counts
+5. Metrics update in real-time
+
+### Creating IPCR Templates
+
+Faculty users can build structured templates:
+
+**Template Builder Features:**
+- ✅ **Section Headers:** Add Strategic Objectives, Core Functions, Support Functions
+- ✅ **SO Headers:** Auto-numbered with Roman numerals (I, II, III, IV...)
+- ✅ **Smart Numbering:** Resets when starting new sections
+- ✅ **Unlimited Support:** Goes beyond XV (XVI, XVII, XVIII...)
+- ✅ **Remove Last Row:** Delete sections/SOs with proper counter updates
+- ✅ **Add Data Rows:** Insert rows for MFO, targets, measures, etc.
+
+**Workflow:**
+1. Click "Create IPCR" in My IPCRs page
+2. Add section header (e.g., Strategic Objectives)
+3. Click "Add SO" to add numbered objectives
+4. Fill in MFO, targets, measures
+5. Repeat for other sections
+6. Click "Save as Template"
+7. Set as Active to enable dashboard tracking
+
+**Save Copy vs Save as Template:**
+- **Save as Template:** Creates reusable structure (appears in Templates section)
+- **Save Copy:** Creates editable draft (appears in Saved Copy section)
+- Click "View" on template → "Save Copy" button creates draft
+
+### Template Management
+
+**Actions available:**
+- **Use:** Load template into IPCR document for editing
+- **View:** Preview template in modal with Save Copy option
+- **Delete:** Remove template permanently
+- **Set Active (radio):** Enable dashboard metrics tracking
+- **Save Copy:** Create editable draft in Saved Copy section
+
+**JSON Storage:**
+When you save a template, the system automatically:
+1. Counts SOs in each section (Strategic Objectives, Core Functions, Support Functions)
+2. Stores counts as JSON in database
+3. Updates dashboard when template is set as active
+4. Calculates percentages based on accomplished vs total
+
+---
+
+## �🔧 Troubleshooting
 
 ### Common Issues and Solutions
 
@@ -355,6 +476,8 @@ php artisan serve
 |-------|----------|
 | **GD extension not found** | Enable in `php.ini`: change `;extension=gd` to `extension=gd`, restart Apache |
 | **Assets not loading** | Run `npm run build` |
+| **Changes not appearing** | Clear browser cache (Ctrl+Shift+R or Cmd+Shift+R) |
+| **Vite build fails** | Delete `node_modules`, run `npm install`, then `npm run build` |
 | **Port 8000 in use** | Use `php artisan serve --port=8001` |
 | **Storage link error** | Run as Administrator |
 | **Database connection error** | Check MySQL is running, verify `.env` credentials |
@@ -373,6 +496,34 @@ php artisan migrate:fresh --seed
 ```
 
 ⚠️ **Warning:** This deletes ALL data!
+
+### Rebuild All Assets
+
+If styles or JavaScript aren't working:
+
+```bash
+# Clean build
+npm run build
+
+# Or rebuild from scratch
+rm -rf node_modules
+rm package-lock.json
+npm install
+npm run build
+```
+
+### Check Build Output
+
+Verify all 23 assets were built:
+
+```bash
+npm run build
+```
+
+Look for:
+- ✅ 12 CSS files
+- ✅ 11 JS files
+- ✅ 1 manifest.json
 
 ### Check GD Extension
 

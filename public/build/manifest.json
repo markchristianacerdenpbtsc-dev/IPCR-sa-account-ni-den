@@ -1,4 +1,13 @@
 {
+  "resources/css/admin_users_create.css": {
+    "file": "assets/admin_users_create-tn0RQdqM.css",
+    "src": "resources/css/admin_users_create.css",
+    "isEntry": true,
+    "name": "admin_users_create",
+    "names": [
+      "admin_users_create.css"
+    ]
+  },
   "resources/css/admin_users_edit.css": {
     "file": "assets/admin_users_edit-CSiFSlnB.css",
     "src": "resources/css/admin_users_edit.css",
@@ -44,6 +53,24 @@
       "auth_login.css"
     ]
   },
+  "resources/css/auth_reset-password.css": {
+    "file": "assets/auth_reset-password-CwMGFW7N.css",
+    "src": "resources/css/auth_reset-password.css",
+    "isEntry": true,
+    "name": "auth_reset-password",
+    "names": [
+      "auth_reset-password.css"
+    ]
+  },
+  "resources/css/auth_verify-code.css": {
+    "file": "assets/auth_verify-code-BkXRsmbH.css",
+    "src": "resources/css/auth_verify-code.css",
+    "isEntry": true,
+    "name": "auth_verify-code",
+    "names": [
+      "auth_verify-code.css"
+    ]
+  },
   "resources/css/dashboard_admin_index.css": {
     "file": "assets/dashboard_admin_index-B54pyw2M.css",
     "src": "resources/css/dashboard_admin_index.css",
@@ -80,6 +107,12 @@
       "dashboard_faculty_profile.css"
     ]
   },
+  "resources/js/admin_users_create.js": {
+    "file": "assets/admin_users_create-Bjk7mCQZ.js",
+    "name": "admin_users_create",
+    "src": "resources/js/admin_users_create.js",
+    "isEntry": true
+  },
   "resources/js/admin_users_edit.js": {
     "file": "assets/admin_users_edit-DSb2pYmH.js",
     "name": "admin_users_edit",
@@ -104,8 +137,20 @@
     "src": "resources/js/auth_login.js",
     "isEntry": true
   },
+  "resources/js/auth_reset-password.js": {
+    "file": "assets/auth_reset-password-i560JFYJ.js",
+    "name": "auth_reset-password",
+    "src": "resources/js/auth_reset-password.js",
+    "isEntry": true
+  },
+  "resources/js/auth_verify-code.js": {
+    "file": "assets/auth_verify-code-WQVDmu41.js",
+    "name": "auth_verify-code",
+    "src": "resources/js/auth_verify-code.js",
+    "isEntry": true
+  },
   "resources/js/dashboard_admin_index.js": {
-    "file": "assets/dashboard_admin_index-BCLylmo4.js",
+    "file": "assets/dashboard_admin_index-csowaPGd.js",
     "name": "dashboard_admin_index",
     "src": "resources/js/dashboard_admin_index.js",
     "isEntry": true

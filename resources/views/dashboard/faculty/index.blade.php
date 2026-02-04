@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Dashboard - IPCR/OPCR Module</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/urs_logo.jpg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @vite(['resources/css/dashboard_faculty_index.css', 'resources/js/dashboard_faculty_index.js'])
@@ -149,16 +150,13 @@
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
         @php
-            // Metrics data - can be modified or fetched from database
-            // Use null or 0 to show N/A in the template
-            $strategicObjectives = ['completed' => 0, 'total' => 0, 'percentage' => 0];
-            $coreFunctions = ['completed' => 0, 'total' => 0, 'percentage' => 0];
-            $supportFunctions = ['completed' => 0, 'total' => 0, 'percentage' => 0];
+            // Variables passed from controller:
+            // $strategicObjectivesText, $strategicObjectivesPercent
+            // $coreFunctionsText, $coreFunctionsPercent
+            // $supportFunctionsText, $supportFunctionsPercent
+            // $ipcrAccomplishedText, $ipcrPercentageText, $ipcrPercentageValue
 
-            // IPCR Progress
-            $ipcrProgress = ['accomplished' => 100, 'percentage' => 0];
-
-            // Expected Targets
+            // Expected Targets (can be fetched from database in the future)
             $expectedTargets = [
                 ['percentage' => 0, 'title' => 'SO I. PROMOTING ACCESS TO QUALITY EDUCATION'],
                 ['percentage' => 0, 'title' => 'SO II. PRODUCING COMPETENT AND COMPETITIVE GRADUATES'],
@@ -166,60 +164,6 @@
                 ['percentage' => 0, 'title' => 'SO IV. ENHANCING COMPETENCIES AND PROFESSIONALISM OF FACULTY AND STAFF'],
                 ['percentage' => 0, 'title' => 'SO VI. IMPROVING THE QUALITY, RELEVANCE AND RESPONSIVENESS'],
             ];
-
-            // Default to 0 when values are null/empty
-            if (empty($strategicObjectives)) {
-                $strategicObjectives = ['completed' => 0, 'total' => 0, 'percentage' => 0];
-            }
-            if (empty($coreFunctions)) {
-                $coreFunctions = ['completed' => 0, 'total' => 0, 'percentage' => 0];
-            }
-            if (empty($supportFunctions)) {
-                $supportFunctions = ['completed' => 0, 'total' => 0, 'percentage' => 0];
-            }
-            if (empty($ipcrProgress)) {
-                $ipcrProgress = ['accomplished' => 0, 'percentage' => 0];
-            }
-            if (empty($expectedTargets)) {
-                $expectedTargets = [
-                    ['percentage' => 0, 'title' => 'N/A'],
-                ];
-            }
-
-            $hasMetricsData = function ($data) {
-                return !empty($data) && isset($data['completed'], $data['total'], $data['percentage']);
-            };
-
-            $strategicObjectivesText = $hasMetricsData($strategicObjectives)
-                ? ($strategicObjectives['completed'] . '/' . $strategicObjectives['total'])
-                : 'N/A';
-            $strategicObjectivesPercent = $hasMetricsData($strategicObjectives)
-                ? ($strategicObjectives['percentage'] . '%')
-                : 'N/A';
-
-            $coreFunctionsText = $hasMetricsData($coreFunctions)
-                ? ($coreFunctions['completed'] . '/' . $coreFunctions['total'])
-                : 'N/A';
-            $coreFunctionsPercent = $hasMetricsData($coreFunctions)
-                ? ($coreFunctions['percentage'] . '%')
-                : 'N/A';
-
-            $supportFunctionsText = $hasMetricsData($supportFunctions)
-                ? ($supportFunctions['completed'] . '/' . $supportFunctions['total'])
-                : 'N/A';
-            $supportFunctionsPercent = $hasMetricsData($supportFunctions)
-                ? ($supportFunctions['percentage'] . '%')
-                : 'N/A';
-
-            $ipcrAccomplishedText = (!empty($ipcrProgress) && isset($ipcrProgress['accomplished']))
-                ? ($ipcrProgress['accomplished'] . '%')
-                : 'N/A';
-            $ipcrPercentageText = (!empty($ipcrProgress) && isset($ipcrProgress['percentage']))
-                ? ($ipcrProgress['percentage'] . '%')
-                : 'N/A';
-            $ipcrPercentageValue = (!empty($ipcrProgress) && isset($ipcrProgress['percentage']))
-                ? $ipcrProgress['percentage']
-                : 0;
         @endphp
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <!-- Left Main Content (2/3 width) -->

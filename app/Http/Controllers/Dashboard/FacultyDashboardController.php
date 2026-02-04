@@ -15,7 +15,79 @@ class FacultyDashboardController extends Controller
 {
     public function index(): View
     {
-        return view('dashboard.faculty.index');
+        // Get the active template for the user
+        $activeTemplate = IpcrTemplate::where('user_id', auth()->id())
+            ->where('is_active', true)
+            ->first();
+
+        // Initialize counters
+        $strategicObjectivesCount = 0;
+        $coreFunctionsCount = 0;
+        $supportFunctionsCount = 0;
+
+        // Use JSON data if available
+        if ($activeTemplate && $activeTemplate->so_count_json) {
+            \Log::info('Active template found with SO counts', [
+                'template_id' => $activeTemplate->id,
+                'so_count_json' => $activeTemplate->so_count_json,
+            ]);
+            
+            $counts = $activeTemplate->so_count_json;
+            $strategicObjectivesCount = $counts['strategic_objectives'] ?? 0;
+            $coreFunctionsCount = $counts['core_functions'] ?? 0;
+            $supportFunctionsCount = $counts['support_functions'] ?? 0;
+        } else {
+            \Log::info('No active template or no so_count_json', [
+                'has_template' => $activeTemplate ? true : false,
+                'template_id' => $activeTemplate->id ?? null,
+                'so_count_json' => $activeTemplate->so_count_json ?? null,
+            ]);
+        }
+
+        // TODO: Replace with actual accomplished counts from database
+        $strategicObjectivesAccomplished = 0;
+        $coreFunctionsAccomplished = 0;
+        $supportFunctionsAccomplished = 0;
+
+        // Format the text display (e.g., "0/3" where 0 is accomplished and 3 is total SOs)
+        // Show "N/A" when total is 0, otherwise show "accomplished/total"
+        $strategicObjectivesText = $strategicObjectivesCount > 0 
+            ? "$strategicObjectivesAccomplished/$strategicObjectivesCount" 
+            : "N/A";
+        $coreFunctionsText = $coreFunctionsCount > 0 
+            ? "$coreFunctionsAccomplished/$coreFunctionsCount" 
+            : "N/A";
+        $supportFunctionsText = $supportFunctionsCount > 0 
+            ? "$supportFunctionsAccomplished/$supportFunctionsCount" 
+            : "N/A";
+
+        // Calculate percentages based on accomplished/total
+        $strategicObjectivesPercent = $strategicObjectivesCount > 0 
+            ? round(($strategicObjectivesAccomplished / $strategicObjectivesCount) * 100) . "%" 
+            : "0%";
+        $coreFunctionsPercent = $coreFunctionsCount > 0 
+            ? round(($coreFunctionsAccomplished / $coreFunctionsCount) * 100) . "%" 
+            : "0%";
+        $supportFunctionsPercent = $supportFunctionsCount > 0 
+            ? round(($supportFunctionsAccomplished / $supportFunctionsCount) * 100) . "%" 
+            : "0%";
+
+        // Dummy IPCR Progress values
+        $ipcrAccomplishedText = "0/0";
+        $ipcrPercentageValue = 0;
+        $ipcrPercentageText = "0%";
+
+        return view('dashboard.faculty.index', compact(
+            'strategicObjectivesText',
+            'strategicObjectivesPercent',
+            'coreFunctionsText',
+            'coreFunctionsPercent',
+            'supportFunctionsText',
+            'supportFunctionsPercent',
+            'ipcrAccomplishedText',
+            'ipcrPercentageValue',
+            'ipcrPercentageText'
+        ));
     }
 
     public function myIpcrs(): View

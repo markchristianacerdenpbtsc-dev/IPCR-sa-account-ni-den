@@ -9,7 +9,11 @@ export default defineConfig({
                 // Auth pages
                 'resources/css/auth_login.css',
                 'resources/css/auth_login-selection.css',
+                'resources/css/auth_verify-code.css',
+                'resources/css/auth_reset-password.css',
                 'resources/js/auth_login.js',
+                'resources/js/auth_verify-code.js',
+                'resources/js/auth_reset-password.js',
                 
                 // Dashboard - Faculty
                 'resources/css/dashboard_faculty_index.css',
@@ -27,9 +31,11 @@ export default defineConfig({
                 'resources/css/admin_users_index.css',
                 'resources/css/admin_users_show.css',
                 'resources/css/admin_users_edit.css',
+                'resources/css/admin_users_create.css',
                 'resources/js/admin_users_index.js',
                 'resources/js/admin_users_show.js',
                 'resources/js/admin_users_edit.js',
+                'resources/js/admin_users_create.js',
             ],
             refresh: true,
         }),
