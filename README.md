@@ -100,392 +100,57 @@ A comprehensive Individual Performance Commitment and Review (IPCR) management s
 
 ---
 
-## 🚀 Installation & Setup
+## 🚀 Quick Start
+
+For detailed installation instructions, see **[INSTRUCTIONS.md](INSTRUCTIONS.md)**
 
 ### Prerequisites
+- PHP >= 8.1 with GD Extension
+- Composer
+- Node.js & NPM (v16+)
+- MySQL/MariaDB
+- XAMPP (recommended for Windows)
 
-Make sure you have the following installed on your computer:
-- **PHP >= 8.1** with **GD Extension enabled** - [Download PHP](https://www.php.net/downloads)
-- **Composer** - [Download Composer](https://getcomposer.org/download/)
-- **MySQL/MariaDB** - Database server
-- **Node.js & NPM** (v16 or higher) - [Download Node.js](https://nodejs.org/)
-- **XAMPP** (recommended for Windows) - [Download XAMPP](https://www.apachefriends.org/)
-  - Includes PHP, MySQL, and Apache in one package
-
-**Note:** If using XAMPP, make sure Apache and MySQL services are running before proceeding.
-
-**Important for Image Uploads:**
-The system requires the PHP GD extension for image compression and resizing. If using XAMPP:
-1. Open `C:\xampp\php\php.ini` in a text editor (as Administrator)
-2. Find `;extension=gd` and remove the semicolon to make it `extension=gd`
-3. Save the file and restart Apache in XAMPP Control Panel
-
----
-
-### 📋 Step-by-Step Setup (Fresh Installation on Another Computer)
-
-#### 1️⃣ Clone the Repository
-
-Open your terminal/command prompt and run:
+### Quick Installation
 
 ```bash
+# Clone repository
 git clone https://github.com/jarlokenpaghubasan/IPCR.git
 cd IPCR
-```
 
-**Or download the ZIP file:**
-- Download the repository as ZIP from GitHub
-- Extract it to your desired location (e.g., `C:\xampp\htdocs\IPCR` for Windows)
-- Open terminal/command prompt and navigate to the project folder
-
----
-
-#### 2️⃣ Install PHP Dependencies
-
-Make sure you're in the project directory, then run:
-
-```bash
+# Install dependencies
 composer install
-```
-
-**If you encounter errors:**
-- Make sure Composer is installed and in your PATH
-- Check that PHP version is 8.1 or higher: `php -v`
-- For Windows XAMPP users, you may need to add PHP to PATH or use the full path: `C:\xampp\php\php.exe composer.phar install`
-
----
-
-#### 3️⃣ Install NPM Dependencies
-
-```bash
 npm install
-```
 
-**If you encounter errors:**
-- Make sure Node.js and NPM are installed: `node -v` and `npm -v`
-- Try clearing npm cache: `npm cache clean --force`
-
----
-
-#### 4️⃣ Environment Configuration
-
-**For Windows (PowerShell):**
-```powershell
-Copy-Item .env.example .env
-```
-
-**For Linux/Mac:**
-```bash
+# Setup environment
 cp .env.example .env
-```
-
-**Edit the `.env` file** with a text editor and configure your database:
-
-```env
-APP_NAME="IPCR System"
-APP_ENV=local
-APP_KEY=
-APP_DEBUG=true
-APP_TIMEZONE=Asia/Hong_Kong
-APP_URL=http://localhost:8000
-
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=ipcr_system
-DB_USERNAME=root
-DB_PASSWORD=
-
-SESSION_DRIVER=database
-```
-
-**Generate Application Key:**
-
-```bash
 php artisan key:generate
-```
 
-This will automatically add the APP_KEY to your .env file.
-
----
-
-#### 5️⃣ Database Setup
-
-**Option A: Using phpMyAdmin (Recommended for XAMPP users)**
-
-1. Start XAMPP Control Panel
-2. Start Apache and MySQL services
-3. Open phpMyAdmin: http://localhost/phpmyadmin
-4. Click "New" in the left sidebar
-5. Database name: `ipcr_system`
-6. Collation: `utf8mb4_unicode_ci`
-7. Click "Create"
-
-**Option B: Using MySQL Command Line**
-
-```bash
-# For XAMPP on Windows
-C:\xampp\mysql\bin\mysql.exe -u root -e "CREATE DATABASE ipcr_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-
-# For Linux/Mac
-mysql -u root -e "CREATE DATABASE ipcr_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-```
-
-**Run Migrations:**
-
-```bash
+# Configure database in .env, then:
 php artisan migrate
-```
-
-This will create all necessary tables:
-- users
-- departments
-- designations
-- user_roles
-- user_photos
-- sessions
-- cache
-- migrations
-
----
-
-#### 6️⃣ Storage Setup
-
-Create the symbolic link for file storage:
-
-**For Windows (PowerShell - Run as Administrator):**
-```powershell
-php artisan storage:link
-```
-
-**For Linux/Mac:**
-```bash
-php artisan storage:link
-```
-
-This creates a symbolic link from `public/storage` to `storage/app/public` for user photo uploads.
-
-**If you encounter permission errors on Windows:**
-- Right-click PowerShell/Command Prompt and select "Run as Administrator"
-- Or manually create the folder: `mkdir storage\app\public\user_photos`
-
----
-
-#### 7️⃣ Seed Database with Admin User
-
-Run the database seeder:
-
-```bash
 php artisan db:seed
-```
+php artisan storage:link
 
-This will create:
-- **3 Departments:** College of Accountancy (COA), College of Business (COB), College of Computer Studies (CCS)
-- **4 Designations:** Professor, Associate Professor, Assistant Professor, Instructor
-- **1 Admin User:** Administrator account
-
-**Default Admin Credentials:**
-- **Username:** `admin`
-- **Password:** `password`
-- **Employee ID:** `URS26-ADM00001`
-- **Email:** `admin@ipcr.system`
-
-**⚠️ Important:** This admin account is protected and cannot be edited or deleted through the UI.
-
----
-
-#### 8️⃣ Create Logo Image Folder
-
-**For Windows (PowerShell):**
-```powershell
-New-Item -Path "public/images" -ItemType Directory -Force
-```
-
-**For Linux/Mac:**
-```bash
-mkdir -p public/images
-```
-
-**Add your logo (Optional):**
-- Place your logo image as `public/images/urs_logo.jpg`
-- Recommended size: 100x100px or similar square/rectangular logo
-- If no logo is provided, the system will work without it
-
----
-
-#### 9️⃣ Build Frontend Assets
-
-Before running the application, you must build the CSS and JavaScript assets:
-
-```bash
+# Build and run
 npm run build
-```
-
-This command:
-- Compiles all CSS and JavaScript files
-- Optimizes and minifies assets for production
-- Creates versioned files in `public/build/` directory
-- Should take about 30 seconds to complete
-
-**Important:** You must run this command at least once before starting the server, or assets won't load properly.
-
----
-
-#### 🔟 Start the Laravel Development Server
-
-**Navigate to the project directory** (very important!):
-
-```bash
-# Make sure you're in the IPCR folder, not the parent folder
-cd C:\xampp\htdocs\IPCR  # Example for Windows
-# OR
-cd /path/to/IPCR  # Example for Linux/Mac
-```
-
-**Start the server:**
-
-```bash
 php artisan serve
 ```
 
-**You should see:**
-```
-INFO  Server running on [http://127.0.0.1:8000].
-Press Ctrl+C to stop the server
-```
+**Access:** http://localhost:8000  
+**Login:** `admin` / `password`
 
-**Access the application:**
-- Open your browser and go to: **http://localhost:8000** or **http://127.0.0.1:8000**
+### Cloudinary Setup (Required for Photo Uploads)
 
-**Common Issues:**
-- **Error: "No such file or directory"** → Make sure you're in the project directory
-- **Port 8000 already in use** → Stop other Laravel servers or use a different port: `php artisan serve --port=8001`
-- **Assets not loading** → Make sure you ran `npm run build`
+Add these to your `.env` file:
 
----
-
-## 🔄 Running on Another Computer (Quick Setup Guide)
-
-If you're transferring this project to another computer:
-
-### 1. Copy Files
-- Copy the entire project folder to the new computer
-- **Or** clone from GitHub: `git clone https://github.com/jarlokenpaghubasan/IPCR.git`
-
-### 2. Install Prerequisites
-- Install PHP >= 8.1, Composer, Node.js, and MySQL
-- **For XAMPP users on Windows:**
-  1. Download and install XAMPP
-  2. Open `C:\xampp\php\php.ini` in a text editor (Run as Administrator)
-  3. Find `;extension=gd` and change it to `extension=gd` (remove the semicolon)
-  4. Save and restart Apache in XAMPP Control Panel
-  5. Verify GD is enabled: `php -m | findstr GD`
-
-### 3. Install Dependencies
-```bash
-cd IPCR  # Navigate to project folder
-composer install
-npm install
-```
-
-### 4. Environment Setup
-```bash
-# For Windows (PowerShell)
-Copy-Item .env.example .env
-
-# For Linux/Mac
-cp .env.example .env
-
-# Generate application key
-php artisan key:generate
-```
-
-### 5. Configure Database
-Edit `.env` file and update these values:
 ```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=ipcr_system
-DB_USERNAME=root
-DB_PASSWORD=
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+CLOUDINARY_URL=cloudinary://your_api_key:your_api_secret@your_cloud_name
 ```
 
-### 6. Create Database
-**Using phpMyAdmin (XAMPP users):**
-- Open http://localhost/phpmyadmin
-- Click "New" → Create database named `ipcr_system`
-- Collation: `utf8mb4_unicode_ci`
-
-**Or using command line:**
-```bash
-# Windows XAMPP
-C:\xampp\mysql\bin\mysql.exe -u root -e "CREATE DATABASE ipcr_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-
-# Linux/Mac
-mysql -u root -e "CREATE DATABASE ipcr_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-```
-
-### 7. Run Migrations & Seed Data
-```bash
-php artisan migrate
-php artisan db:seed
-```
-
-This creates:
-- All database tables
-- 3 Departments (COA, COB, CCS)
-- 4 Designations (Professor levels)
-- 1 Admin user (username: `admin`, password: `password`)
-
-### 8. Setup Storage
-```bash
-# Run as Administrator on Windows
-php artisan storage:link
-```
-
-### 9. Build Frontend Assets
-```bash
-npm run build
-```
-
-This compiles and optimizes all CSS/JS files. **Must be done before starting the server!**
-
-### 10. Start the Server
-```bash
-php artisan serve
-```
-
-Access at: **http://localhost:8000**
-
-**Login with:**
-- Username: `admin`
-- Password: `password`
-
----
-
-### Troubleshooting Common Issues
-
-**"GD extension not found" error when uploading photos:**
-- Enable GD in `php.ini` (see step 2 above)
-- Restart Apache
-- Verify: `php -m | findstr GD` (Windows) or `php -m | grep GD` (Linux/Mac)
-
-**Assets not loading (blank page):**
-- Make sure you ran `npm run build`
-- Check that `public/build/` folder exists
-
-**Port 8000 already in use:**
-- Use different port: `php artisan serve --port=8001`
-
-**Storage link error on Windows:**
-- Run PowerShell/CMD as Administrator
-- Or manually create: `mkdir storage\app\public\user_photos`
-
-**Database connection error:**
-- Verify MySQL is running in XAMPP
-- Check `.env` database credentials
-- Ensure database `ipcr_system` exists
+See [INSTRUCTIONS.md](INSTRUCTIONS.md) for detailed Cloudinary setup guide.
 
 ---
 
@@ -596,129 +261,27 @@ ipcr_system/
 
 ## 🔧 Troubleshooting
 
-### Issue: "Please provide a valid cache path"
+---
+
+## 🔧 Troubleshooting
+
+For detailed troubleshooting, see **[INSTRUCTIONS.md](INSTRUCTIONS.md)**
+
+### Quick Fixes
 
 ```bash
-php artisan config:clear
-php artisan cache:clear
-```
-
-### Issue: Storage link not working
-
-```bash
-# For Windows (Run PowerShell as Administrator)
-Remove-Item public/storage -Force -ErrorAction SilentlyContinue
-php artisan storage:link
-
-# For Linux/Mac
-rm -f public/storage
-php artisan storage:link
-```
-
-### Issue: Migration errors
-
-```bash
-# Rollback and re-migrate (WARNING: This will delete all data)
-php artisan migrate:fresh
-
-# Then seed again
-php artisan db:seed
-```
-
-### Issue: "Class not found" errors
-
-```bash
-# Regenerate autoload files
-composer dump-autoload
-
 # Clear all caches
-php artisan cache:clear
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
-```
+php artisan optimize:clear
 
-### Issue: Assets (CSS/JS) not loading
-
-```bash
 # Rebuild assets
 npm run build
 
-# If that doesn't work, clear node_modules and reinstall
-rm -rf node_modules
-npm install
-npm run build
+# Reset database (WARNING: deletes all data)
+php artisan migrate:fresh --seed
+
+# Regenerate autoload
+composer dump-autoload
 ```
-
-### Issue: Permission denied (Linux/Mac)
-
-```bash
-chmod -R 775 storage bootstrap/cache
-chown -R www-data:www-data storage bootstrap/cache
-```
-
-### Issue: Cannot run php artisan serve
-
-**Problem:** Command not found or not running from correct directory
-
-**Solution:**
-1. Make sure you're in the project directory:
-   ```bash
-   cd C:\xampp\htdocs\IPCR  # Windows
-   cd /path/to/IPCR  # Linux/Mac
-   ```
-2. Verify you're in the right folder (should see artisan file):
-   ```bash
-   ls  # Linux/Mac
-   dir  # Windows
-   ```
-3. Check PHP is in PATH:
-   ```bash
-   php -v
-   ```
-
-### Issue: Port 8000 already in use
-
-```bash
-# Use a different port
-php artisan serve --port=8001
-
-# Or stop the existing server:
-# Press Ctrl+C in the terminal running the server
-```
-
-### Issue: Database connection error
-
-1. **Check XAMPP services:** Make sure MySQL is running in XAMPP Control Panel
-2. **Verify .env settings:** Check DB_DATABASE, DB_USERNAME, DB_PASSWORD
-3. **Test MySQL connection:**
-   ```bash
-   # For XAMPP on Windows
-   C:\xampp\mysql\bin\mysql.exe -u root
-   
-   # For Linux/Mac
-   mysql -u root
-   ```
-4. **Verify database exists:**
-   ```sql
-   SHOW DATABASES;
-   ```
-
-### Issue: "npm command not found"
-
-**Solution:** Install Node.js from https://nodejs.org/
-- Download LTS version
-- Install with default settings
-- Restart terminal/command prompt
-- Verify: `node -v` and `npm -v`
-
-### Issue: "composer command not found"
-
-**Solution:** Install Composer from https://getcomposer.org/download/
-- For Windows: Download and run Composer-Setup.exe
-- For Linux/Mac: Follow installation instructions on website
-- Restart terminal/command prompt
-- Verify: `composer -v`
 
 ---
 
