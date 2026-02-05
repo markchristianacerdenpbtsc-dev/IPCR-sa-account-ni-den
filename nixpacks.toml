@@ -1,14 +1,15 @@
 [phases.setup]
-nixPkgs = ['php82', 'php82Packages.composer']
+nixPkgs = ['php82', 'php82Packages.composer', 'nodejs_20']
 
 [phases.install]
 cmds = [
-  'composer install --optimize-autoloader --no-dev'
+  'composer install --optimize-autoloader --no-dev',
+  'npm ci'
 ]
 
 [phases.build]
 cmds = [
-  'echo "Using pre-built assets"',
+  'npm run build',
   'mkdir -p storage/app/public/user_photos',
   'chmod -R 775 storage'
 ]
