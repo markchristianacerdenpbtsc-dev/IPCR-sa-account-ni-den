@@ -213,6 +213,24 @@
                 </div>
 
                 <!-- IPCR Progress Bar -->
+                @php
+                    // Parse metric card values to calculate total progress
+                    $parseMetric = function($text) {
+                        if (preg_match('/(\d+)\/(\d+)/', $text, $matches)) {
+                            return ['accomplished' => (int)$matches[1], 'total' => (int)$matches[2]];
+                        }
+                        return ['accomplished' => 0, 'total' => 0];
+                    };
+                    
+                    $strategic = $parseMetric($strategicObjectivesText);
+                    $core = $parseMetric($coreFunctionsText);
+                    $support = $parseMetric($supportFunctionsText);
+                    
+                    $totalAccomplished = $strategic['accomplished'] + $core['accomplished'] + $support['accomplished'];
+                    $totalGoals = $strategic['total'] + $core['total'] + $support['total'];
+                    
+                    $calculatedPercentage = $totalGoals > 0 ? round(($totalAccomplished / $totalGoals) * 100, 1) : 0;
+                @endphp
                 <div class="metric-card">
                     <div class="mb-3 sm:mb-4">
                         <h3 class="text-base sm:text-lg font-bold text-gray-900">IPCR Progress Bar</h3>
@@ -220,13 +238,13 @@
                     <div class="space-y-2">
                         <div class="flex justify-between items-center mb-2">
                             <span class="text-xs sm:text-sm text-gray-600">Accomplished Goal</span>
-                            <span class="text-xs sm:text-sm font-semibold text-gray-900">{{ $ipcrAccomplishedText }}</span>
+                            <span class="text-xs sm:text-sm font-semibold text-gray-900">{{ $totalAccomplished }}/{{ $totalGoals }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-xs sm:text-sm font-bold text-indigo-600">{{ $calculatedPercentage }}% Complete</span>
                         </div>
                         <div class="progress-bar-container">
-                            <div class="progress-bar-fill" style="width: {{ $ipcrPercentageValue }}%;"></div>
-                        </div>
-                        <div class="mt-2">
-                            <span class="text-xs sm:text-sm font-bold text-indigo-600">{{ $ipcrPercentageText }}</span>
+                            <div class="progress-bar-fill" style="width: {{ $calculatedPercentage }}%;"></div>
                         </div>
                     </div>
                 </div>
