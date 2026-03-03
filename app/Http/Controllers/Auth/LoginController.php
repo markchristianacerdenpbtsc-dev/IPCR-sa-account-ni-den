@@ -68,6 +68,23 @@ class LoginController extends Controller
             ]);
         }
 
+        // Check if the role has dashboard access permission (admin always bypasses)
+        if (!$user->hasRole('admin')) {
+            $dashboardPermissionMap = [
+                'faculty'  => 'faculty.dashboard',
+                'dean'     => 'dean.dashboard',
+                'director' => 'director.dashboard',
+                'admin'    => 'admin.dashboard',
+            ];
+
+            $permissionKey = $dashboardPermissionMap[$credentials['role']] ?? null;
+            if ($permissionKey && !$user->hasPermission($permissionKey)) {
+                return back()->withErrors([
+                    'username' => 'Your ' . ucfirst($credentials['role']) . ' role does not have dashboard access. Please contact an administrator.',
+                ]);
+            }
+        }
+
         // Update last login timestamp
         $user->update([
             'last_login_at' => now(),
@@ -91,13 +108,13 @@ class LoginController extends Controller
     {
         switch ($role) {
             case 'admin':
-                return redirect()->route('admin.dashboard');
+                return redirect()->route('admin.dashboard')->header('Turbo-Visit-Control', 'reload');
             case 'director':
-                return redirect()->route('director.dashboard');
+                return redirect()->route('director.dashboard')->header('Turbo-Visit-Control', 'reload');
             case 'faculty':
-                return redirect()->route('faculty.dashboard');
+                return redirect()->route('faculty.dashboard')->header('Turbo-Visit-Control', 'reload');
             default:
-                return redirect()->route('login.selection');
+                return redirect()->route('login.selection')->header('Turbo-Visit-Control', 'reload');
         }
     }
 

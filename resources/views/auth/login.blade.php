@@ -44,7 +44,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('login') }}">
+                <form method="POST" action="{{ route('login') }}" data-turbo="false">
                     @csrf
 
                     <input type="hidden" name="role" value="{{ $role }}">

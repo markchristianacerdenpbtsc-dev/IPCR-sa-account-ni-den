@@ -346,29 +346,25 @@
     </div>
 
     <!-- Delete Photo Confirmation Modal -->
-    <div id="deletePhotoModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full animate-scale-in transition-colors">
-            <div class="bg-red-50 dark:bg-red-900/10 border-b border-red-200 dark:border-red-800 px-6 py-5 flex items-center gap-4">
-                <div class="bg-red-100 dark:bg-red-900/30 rounded-full p-3 flex-shrink-0">
-                    <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 text-xl"></i>
+    <div id="deletePhotoModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm transition-opacity">
+        <div class="absolute inset-0 bg-black/40"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4 animate-scale-in transition-colors z-10">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/30 flex items-center justify-center">
+                    <i class="fas fa-trash-can text-red-500 dark:text-red-400"></i>
                 </div>
                 <div>
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Confirm Delete</h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">This action cannot be undone</p>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Confirm Delete</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">This cannot be undone</p>
                 </div>
             </div>
-
-            <div class="px-6 py-6">
-                <p class="text-gray-700 dark:text-gray-300 mb-2">Are you sure you want to delete this photo?</p>
-                <p class="text-sm text-gray-500 dark:text-gray-400">The photo will be permanently removed from the system.</p>
-            </div>
-
-            <div class="bg-gray-50/50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-700 px-6 py-4 flex gap-3 justify-end rounded-b-2xl transition-colors">
-                <button type="button" onclick="closeDeletePhotoModal()" class="px-5 py-2.5 rounded-lg font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm text-sm">
-                    Cancel
-                </button>
-                <button type="button" onclick="confirmDeletePhoto()" class="px-5 py-2.5 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 transition flex items-center gap-2 text-sm shadow-sm">
-                    <i class="fas fa-trash"></i> Delete
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-5">
+                Are you sure you want to delete this photo? The photo will be permanently removed from the system.
+            </p>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeDeletePhotoModal()" class="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition">Cancel</button>
+                <button type="button" onclick="confirmDeletePhoto()" class="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg font-medium transition flex items-center gap-2">
+                    <span>Delete</span>
                 </button>
             </div>
         </div>

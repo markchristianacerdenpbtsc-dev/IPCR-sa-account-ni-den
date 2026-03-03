@@ -295,21 +295,25 @@
 
 @push('modals')
     <!-- Confirmation Modal -->
-    <div id="confirmationModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full animate-scale-in">
-            <div class="p-5 text-center">
-                <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-exclamation-triangle text-red-500 text-lg"></i>
+    <div id="confirmationModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm transition-opacity">
+        <div class="absolute inset-0 bg-black/40"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4 animate-scale-in transition-colors z-10">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/30 flex items-center justify-center">
+                    <i class="fas fa-trash-can text-red-500 dark:text-red-400"></i>
                 </div>
-                <h2 class="text-base font-bold text-gray-900 mb-1">Delete User</h2>
-                <p class="text-sm text-gray-500">Are you sure you want to delete <span id="deleteUserName" class="font-semibold text-gray-700">this user</span>? This action cannot be undone.</p>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Delete User</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">This cannot be undone</p>
+                </div>
             </div>
-            <div class="border-t border-gray-100 px-5 py-3 flex gap-2 justify-end">
-                <button type="button" onclick="closeConfirmationModal()" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition">
-                    Cancel
-                </button>
-                <button type="button" onclick="confirmDelete()" class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition">
-                    Delete
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-5">
+                Are you sure you want to delete <strong id="deleteUserName" class="text-gray-900 dark:text-white">this user</strong>? This action will permanently remove their data from the system.
+            </p>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeConfirmationModal()" class="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition">Cancel</button>
+                <button type="button" onclick="confirmDelete()" class="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg font-medium transition flex items-center gap-2">
+                    <span>Delete</span>
                 </button>
             </div>
         </div>

@@ -89,206 +89,206 @@ Route::post('/email/verification/verify', [EmailVerificationController::class, '
 
 Route::get('/faculty/dashboard', [FacultyDashboardController::class, 'index'])
     ->name('faculty.dashboard')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.dashboard']);
 
 Route::get('/faculty/my-ipcrs', [FacultyDashboardController::class, 'myIpcrs'])
     ->name('faculty.my-ipcrs')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.dashboard']);
 
 Route::get('/faculty/profile', [FacultyDashboardController::class, 'profile'])
     ->name('faculty.profile')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.profile.manage']);
 
 Route::patch('/faculty/password/change', [FacultyDashboardController::class, 'changePassword'])
     ->name('faculty.password.change')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.profile.manage']);
 
 Route::patch('/faculty/profile/update', [FacultyDashboardController::class, 'updateProfile'])
     ->name('faculty.profile.update')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.profile.manage']);
 
 Route::post('/faculty/profile/photo/upload', [FacultyDashboardController::class, 'uploadPhoto'])
     ->name('faculty.profile.photo.upload')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.profile.manage']);
 
 Route::get('/faculty/profile/photos', [FacultyDashboardController::class, 'getPhotos'])
     ->name('faculty.profile.photos')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.profile.manage']);
 
 Route::post('/faculty/profile/photo/set-profile', [FacultyDashboardController::class, 'setProfilePhoto'])
     ->name('faculty.profile.photo.set-profile')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.profile.manage']);
 
 Route::delete('/faculty/profile/photo/{id}', [FacultyDashboardController::class, 'deletePhoto'])
     ->name('faculty.profile.photo.delete')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.profile.manage']);
 
 // IPCR Template Routes
 Route::get('/faculty/ipcr/templates', [IpcrTemplateController::class, 'index'])
     ->name('faculty.ipcr.templates.index')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.templates']);
 
 Route::post('/faculty/ipcr/store', [IpcrTemplateController::class, 'store'])
     ->name('faculty.ipcr.store')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.templates']);
 
 Route::post('/faculty/ipcr/templates/from-saved-copy', [IpcrTemplateController::class, 'storeFromSavedCopy'])
     ->name('faculty.ipcr.templates.from-saved-copy')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.templates']);
 
 Route::post('/faculty/ipcr/templates/{id}/save-copy', [IpcrTemplateController::class, 'saveCopy'])
     ->name('faculty.ipcr.templates.save-copy')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.templates']);
 
 Route::get('/faculty/ipcr/templates/{id}', [IpcrTemplateController::class, 'show'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.templates']);
 
 Route::delete('/faculty/ipcr/templates/{id}', [IpcrTemplateController::class, 'destroy'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.templates']);
 
 Route::put('/faculty/ipcr/templates/{id}', [IpcrTemplateController::class, 'update'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.templates']);
 
 Route::post('/faculty/ipcr/templates/{id}/set-active', [IpcrTemplateController::class, 'setActive'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.templates']);
 
 // IPCR Submission Routes
 Route::post('/faculty/ipcr/submissions', [IpcrSubmissionController::class, 'store'])
     ->name('faculty.ipcr.submissions.store')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.submissions']);
 
 Route::get('/faculty/ipcr/submissions/{id}', [IpcrSubmissionController::class, 'show'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.submissions']);
 
 Route::put('/faculty/ipcr/submissions/{id}', [IpcrSubmissionController::class, 'update'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.submissions']);
 
 Route::post('/faculty/ipcr/submissions/{id}/set-active', [IpcrSubmissionController::class, 'setActive'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.submissions']);
 
 Route::post('/faculty/ipcr/submissions/{id}/deactivate', [IpcrSubmissionController::class, 'deactivate'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.submissions']);
 
 Route::post('/faculty/ipcr/submissions/{id}/unsubmit', [IpcrSubmissionController::class, 'unsubmit'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.submissions']);
 
 Route::delete('/faculty/ipcr/submissions/{id}', [IpcrSubmissionController::class, 'destroy'])
-    ->middleware(['auth', 'role:faculty,admin']);
+    ->middleware(['auth', 'role:faculty,admin', 'permission:faculty.ipcr.submissions']);
 
 // IPCR Saved Copy Routes
 Route::get('/faculty/ipcr/saved-copies', [IpcrSavedCopyController::class, 'index'])
     ->name('faculty.ipcr.saved-copies.index')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.saved-copies']);
 
 Route::post('/faculty/ipcr/saved-copies', [IpcrSavedCopyController::class, 'store'])
     ->name('faculty.ipcr.saved-copies.store')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.saved-copies']);
 
 Route::get('/faculty/ipcr/saved-copies/{id}', [IpcrSavedCopyController::class, 'show'])
     ->name('faculty.ipcr.saved-copies.show')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.saved-copies']);
 
 Route::put('/faculty/ipcr/saved-copies/{id}', [IpcrSavedCopyController::class, 'update'])
     ->name('faculty.ipcr.saved-copies.update')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.saved-copies']);
 
 Route::delete('/faculty/ipcr/saved-copies/{id}', [IpcrSavedCopyController::class, 'destroy'])
     ->name('faculty.ipcr.saved-copies.destroy')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.ipcr.saved-copies']);
 
-// OPCR Template Routes (Dean only via faculty gate)
+// OPCR Template Routes (Dean only)
 Route::get('/faculty/opcr/templates', [OpcrTemplateController::class, 'index'])
     ->name('faculty.opcr.templates.index')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.templates']);
 
 Route::post('/faculty/opcr/store', [OpcrTemplateController::class, 'store'])
     ->name('faculty.opcr.store')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.templates']);
 
 Route::post('/faculty/opcr/templates/from-saved-copy', [OpcrTemplateController::class, 'storeFromSavedCopy'])
     ->name('faculty.opcr.templates.from-saved-copy')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.templates']);
 
 Route::post('/faculty/opcr/templates/{id}/save-copy', [OpcrTemplateController::class, 'saveCopy'])
     ->name('faculty.opcr.templates.save-copy')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.templates']);
 
 Route::get('/faculty/opcr/templates/{id}', [OpcrTemplateController::class, 'show'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.templates']);
 
 Route::delete('/faculty/opcr/templates/{id}', [OpcrTemplateController::class, 'destroy'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.templates']);
 
 Route::put('/faculty/opcr/templates/{id}', [OpcrTemplateController::class, 'update'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.templates']);
 
 Route::post('/faculty/opcr/templates/{id}/set-active', [OpcrTemplateController::class, 'setActive'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.templates']);
 
-// OPCR Submission Routes
+// OPCR Submission Routes (Dean only)
 Route::post('/faculty/opcr/submissions', [OpcrSubmissionController::class, 'store'])
     ->name('faculty.opcr.submissions.store')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.submissions']);
 
 Route::get('/faculty/opcr/submissions/{id}', [OpcrSubmissionController::class, 'show'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.submissions']);
 
 Route::put('/faculty/opcr/submissions/{id}', [OpcrSubmissionController::class, 'update'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.submissions']);
 
 Route::post('/faculty/opcr/submissions/{id}/set-active', [OpcrSubmissionController::class, 'setActive'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.submissions']);
 
 Route::post('/faculty/opcr/submissions/{id}/deactivate', [OpcrSubmissionController::class, 'deactivate'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.submissions']);
 
 Route::post('/faculty/opcr/submissions/{id}/unsubmit', [OpcrSubmissionController::class, 'unsubmit'])
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.submissions']);
 
 Route::delete('/faculty/opcr/submissions/{id}', [OpcrSubmissionController::class, 'destroy'])
-    ->middleware(['auth', 'role:faculty,admin']);
+    ->middleware(['auth', 'role:faculty,admin', 'permission:dean.opcr.submissions']);
 
-// OPCR Saved Copy Routes
+// OPCR Saved Copy Routes (Dean only)
 Route::get('/faculty/opcr/saved-copies', [OpcrSavedCopyController::class, 'index'])
     ->name('faculty.opcr.saved-copies.index')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.saved-copies']);
 
 Route::post('/faculty/opcr/saved-copies', [OpcrSavedCopyController::class, 'store'])
     ->name('faculty.opcr.saved-copies.store')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.saved-copies']);
 
 Route::get('/faculty/opcr/saved-copies/{id}', [OpcrSavedCopyController::class, 'show'])
     ->name('faculty.opcr.saved-copies.show')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.saved-copies']);
 
 Route::put('/faculty/opcr/saved-copies/{id}', [OpcrSavedCopyController::class, 'update'])
     ->name('faculty.opcr.saved-copies.update')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.saved-copies']);
 
 Route::delete('/faculty/opcr/saved-copies/{id}', [OpcrSavedCopyController::class, 'destroy'])
     ->name('faculty.opcr.saved-copies.destroy')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:dean.opcr.saved-copies']);
 
 // Supporting Document Routes
 Route::get('/faculty/supporting-documents', [\App\Http\Controllers\Faculty\SupportingDocumentController::class, 'index'])
     ->name('faculty.supporting-documents.index')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.supporting-documents']);
 
 Route::post('/faculty/supporting-documents', [\App\Http\Controllers\Faculty\SupportingDocumentController::class, 'store'])
     ->name('faculty.supporting-documents.store')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.supporting-documents']);
 
 Route::delete('/faculty/supporting-documents/{id}', [\App\Http\Controllers\Faculty\SupportingDocumentController::class, 'destroy'])
     ->name('faculty.supporting-documents.destroy')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.supporting-documents']);
 
 Route::put('/faculty/supporting-documents/{id}/rename', [\App\Http\Controllers\Faculty\SupportingDocumentController::class, 'rename'])
     ->name('faculty.supporting-documents.rename')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.supporting-documents']);
 
 Route::get('/faculty/supporting-documents/{id}/download', [\App\Http\Controllers\Faculty\SupportingDocumentController::class, 'download'])
     ->name('faculty.supporting-documents.download')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty', 'permission:faculty.supporting-documents']);
 
 
 /*
@@ -299,24 +299,24 @@ Route::get('/faculty/supporting-documents/{id}/download', [\App\Http\Controllers
 
 Route::get('/dean/dashboard', [DeanDashboardController::class, 'index'])
     ->name('dean.dashboard')
-    ->middleware(['auth', 'role:dean']);
+    ->middleware(['auth', 'role:dean', 'permission:dean.dashboard']);
 
 // Dean IPCR Review Routes
 Route::get('/dean/review/faculty-submissions', [DeanReviewController::class, 'facultySubmissions'])
     ->name('dean.review.faculty-submissions')
-    ->middleware(['auth', 'role:dean']);
+    ->middleware(['auth', 'role:dean', 'permission:dean.review.faculty']);
 
 Route::get('/dean/review/faculty-submissions/{id}', [DeanReviewController::class, 'showFacultySubmission'])
     ->name('dean.review.faculty-submission.show')
-    ->middleware(['auth', 'role:dean']);
+    ->middleware(['auth', 'role:dean', 'permission:dean.review.faculty']);
 
 Route::get('/dean/review/dean-submissions', [DeanReviewController::class, 'deanSubmissions'])
     ->name('dean.review.dean-submissions')
-    ->middleware(['auth', 'role:dean']);
+    ->middleware(['auth', 'role:dean', 'permission:dean.review.deans']);
 
 Route::get('/dean/review/dean-submissions/{id}', [DeanReviewController::class, 'showDeanSubmission'])
     ->name('dean.review.dean-submission.show')
-    ->middleware(['auth', 'role:dean']);
+    ->middleware(['auth', 'role:dean', 'permission:dean.review.deans']);
 
 
 /*
@@ -327,7 +327,7 @@ Route::get('/dean/review/dean-submissions/{id}', [DeanReviewController::class, '
 
 Route::get('/director/dashboard', [DirectorDashboardController::class, 'index'])
     ->name('director.dashboard')
-    ->middleware(['auth', 'role:director']);
+    ->middleware(['auth', 'role:director', 'permission:director.dashboard']);
 
 
 /*
@@ -338,7 +338,7 @@ Route::get('/director/dashboard', [DirectorDashboardController::class, 'index'])
 
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
     ->name('admin.dashboard')
-    ->middleware(['auth', 'role:admin']);
+    ->middleware(['auth', 'role:admin', 'permission:admin.dashboard']);
 
 
 /*
@@ -349,52 +349,62 @@ Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin/panel')->name('admin.')->group(function () {
     // User Management
-    Route::resource('users', UserManagementController::class);
-    
-    Route::patch('users/{user}/toggle-active', [UserManagementController::class, 'toggleActive'])
-        ->name('users.toggleActive');
+    Route::middleware(['permission:admin.users.manage'])->group(function () {
+        Route::resource('users', UserManagementController::class);
+        
+        Route::patch('users/{user}/toggle-active', [UserManagementController::class, 'toggleActive'])
+            ->name('users.toggleActive');
 
-    Route::get('users/{user}/json', [UserManagementController::class, 'showJson'])
-        ->name('users.showJson');
+        Route::get('users/{user}/json', [UserManagementController::class, 'showJson'])
+            ->name('users.showJson');
+    });
     
     // Photo Management
-    Route::post('users/{user}/photo/upload', [PhotoController::class, 'upload'])
-        ->name('users.photo.upload');
-    
-    Route::delete('users/{user}/photos/{photo}', [PhotoController::class, 'delete'])
-        ->name('users.photo.delete');
-    
-    Route::patch('users/{user}/photos/{photo}/set-profile', [PhotoController::class, 'setAsProfile'])
-        ->name('users.photo.setProfile');
-    
-    Route::get('users/{user}/photos', [PhotoController::class, 'getUserPhotos'])
-        ->name('users.photos.get');
+    Route::middleware(['permission:admin.photos.manage'])->group(function () {
+        Route::post('users/{user}/photo/upload', [PhotoController::class, 'upload'])
+            ->name('users.photo.upload');
+        
+        Route::delete('users/{user}/photos/{photo}', [PhotoController::class, 'delete'])
+            ->name('users.photo.delete');
+        
+        Route::patch('users/{user}/photos/{photo}/set-profile', [PhotoController::class, 'setAsProfile'])
+            ->name('users.photo.setProfile');
+        
+        Route::get('users/{user}/photos', [PhotoController::class, 'getUserPhotos'])
+            ->name('users.photos.get');
+    });
 
     // Database Management
-    Route::get('database', [DatabaseManagementController::class, 'index'])->name('database.index');
-    Route::post('database/backup', [DatabaseManagementController::class, 'backup'])->name('database.backup');
-    Route::get('database/download/{filename}', [DatabaseManagementController::class, 'download'])->name('database.download');
-    Route::post('database/restore/{filename}', [DatabaseManagementController::class, 'restore'])->name('database.restore');
-    Route::delete('database/{filename}', [DatabaseManagementController::class, 'delete'])->name('database.delete');
-    Route::post('database/upload', [DatabaseManagementController::class, 'upload'])->name('database.upload');
-    Route::post('database/settings', [DatabaseManagementController::class, 'updateSettings'])->name('database.settings');
+    Route::middleware(['permission:admin.database.manage'])->group(function () {
+        Route::get('database', [DatabaseManagementController::class, 'index'])->name('database.index');
+        Route::post('database/backup', [DatabaseManagementController::class, 'backup'])->name('database.backup');
+        Route::get('database/download/{filename}', [DatabaseManagementController::class, 'download'])->name('database.download');
+        Route::post('database/restore/{filename}', [DatabaseManagementController::class, 'restore'])->name('database.restore');
+        Route::delete('database/{filename}', [DatabaseManagementController::class, 'delete'])->name('database.delete');
+        Route::post('database/upload', [DatabaseManagementController::class, 'upload'])->name('database.upload');
+        Route::post('database/settings', [DatabaseManagementController::class, 'updateSettings'])->name('database.settings');
+    });
 
     // Activity Logs
-    Route::get('activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
-    Route::get('activity-logs/export', [\App\Http\Controllers\Admin\ActivityLogController::class, 'export'])->name('activity-logs.export');
+    Route::middleware(['permission:admin.activity-logs.view'])->group(function () {
+        Route::get('activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
+        Route::get('activity-logs/export', [\App\Http\Controllers\Admin\ActivityLogController::class, 'export'])->name('activity-logs.export');
+    });
 
     // Role & Department Management
-    Route::get('role-management', [RoleDesignationController::class, 'index'])->name('role-management.index');
-    // Roles
-    Route::post('role-management/roles', [RoleDesignationController::class, 'storeRole'])->name('role-management.roles.store');
-    Route::put('role-management/roles/{role}', [RoleDesignationController::class, 'updateRole'])->name('role-management.roles.update');
-    Route::delete('role-management/roles/{role}', [RoleDesignationController::class, 'destroyRole'])->name('role-management.roles.destroy');
-    // Departments
-    Route::post('role-management/departments', [RoleDesignationController::class, 'storeDepartment'])->name('role-management.departments.store');
-    Route::put('role-management/departments/{department}', [RoleDesignationController::class, 'updateDepartment'])->name('role-management.departments.update');
-    Route::delete('role-management/departments/{department}', [RoleDesignationController::class, 'destroyDepartment'])->name('role-management.departments.destroy');
-    // Designations
-    Route::post('role-management/designations', [RoleDesignationController::class, 'storeDesignation'])->name('role-management.designations.store');
-    Route::put('role-management/designations/{designation}', [RoleDesignationController::class, 'updateDesignation'])->name('role-management.designations.update');
-    Route::delete('role-management/designations/{designation}', [RoleDesignationController::class, 'destroyDesignation'])->name('role-management.designations.destroy');
+    Route::middleware(['permission:admin.role-management.manage'])->group(function () {
+        Route::get('role-management', [RoleDesignationController::class, 'index'])->name('role-management.index');
+        // Roles
+        Route::post('role-management/roles', [RoleDesignationController::class, 'storeRole'])->name('role-management.roles.store');
+        Route::put('role-management/roles/{role}', [RoleDesignationController::class, 'updateRole'])->name('role-management.roles.update');
+        Route::delete('role-management/roles/{role}', [RoleDesignationController::class, 'destroyRole'])->name('role-management.roles.destroy');
+        // Departments
+        Route::post('role-management/departments', [RoleDesignationController::class, 'storeDepartment'])->name('role-management.departments.store');
+        Route::put('role-management/departments/{department}', [RoleDesignationController::class, 'updateDepartment'])->name('role-management.departments.update');
+        Route::delete('role-management/departments/{department}', [RoleDesignationController::class, 'destroyDepartment'])->name('role-management.departments.destroy');
+        // Designations
+        Route::post('role-management/designations', [RoleDesignationController::class, 'storeDesignation'])->name('role-management.designations.store');
+        Route::put('role-management/designations/{designation}', [RoleDesignationController::class, 'updateDesignation'])->name('role-management.designations.update');
+        Route::delete('role-management/designations/{designation}', [RoleDesignationController::class, 'destroyDesignation'])->name('role-management.designations.destroy');
+    });
 });

@@ -123,13 +123,19 @@
                                         <button onclick="openEditRoleModal({{ $role->id }}, '{{ addslashes($role->name) }}', '{{ $role->acronym }}', {{ json_encode($role->permissions->pluck('key')) }})" class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors" title="Edit">
                                             <i class="fas fa-pen text-xs"></i>
                                         </button>
+                                        @if(strtolower($role->name) !== 'admin')
                                         <form method="POST" action="{{ route('admin.role-management.roles.destroy', $role) }}" class="inline deleteForm" style="margin:0;">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="button" onclick="openDeleteModal('{{ addslashes($role->name) }}', this.form)" class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors" title="Delete">
+                                            <button type="button" onclick="openRmDeleteModal('{{ addslashes($role->name) }}', this.form)" class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors" title="Delete">
                                                 <i class="fas fa-trash-can text-xs"></i>
                                             </button>
                                         </form>
+                                        @else
+                                        <span class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-300 dark:text-gray-600 cursor-not-allowed" title="Admin role is protected">
+                                            <i class="fas fa-lock text-xs"></i>
+                                        </span>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -168,13 +174,19 @@
                             <button onclick="openEditRoleModal({{ $role->id }}, '{{ addslashes($role->name) }}', '{{ $role->acronym }}', {{ json_encode($role->permissions->pluck('key')) }})" class="w-8 h-8 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-200 dark:hover:bg-emerald-900/30 dark:hover:border-emerald-800 transition-colors">
                                 <i class="fas fa-pen text-xs"></i>
                             </button>
+                            @if(strtolower($role->name) !== 'admin')
                             <form method="POST" action="{{ route('admin.role-management.roles.destroy', $role) }}" class="inline deleteForm" style="margin:0;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="button" onclick="openDeleteModal('{{ addslashes($role->name) }}', this.form)" class="w-8 h-8 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/30 dark:hover:border-red-800 transition-colors">
+                                <button type="button" onclick="openRmDeleteModal('{{ addslashes($role->name) }}', this.form)" class="w-8 h-8 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/30 dark:hover:border-red-800 transition-colors">
                                     <i class="fas fa-trash-can text-xs"></i>
                                 </button>
                             </form>
+                            @else
+                            <span class="w-8 h-8 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-600 text-gray-300 dark:text-gray-600 cursor-not-allowed" title="Admin role is protected">
+                                <i class="fas fa-lock text-xs"></i>
+                            </span>
+                            @endif
                         </div>
                     </div>
                 @empty
@@ -228,7 +240,7 @@
                                         <form method="POST" action="{{ route('admin.role-management.departments.destroy', $dept) }}" class="inline deleteForm" style="margin:0;">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="button" onclick="openDeleteModal('{{ addslashes($dept->name) }}', this.form)" class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors" title="Delete">
+                                            <button type="button" onclick="openRmDeleteModal('{{ addslashes($dept->name) }}', this.form)" class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors" title="Delete">
                                                 <i class="fas fa-trash-can text-xs"></i>
                                             </button>
                                         </form>
@@ -265,7 +277,7 @@
                             <form method="POST" action="{{ route('admin.role-management.departments.destroy', $dept) }}" class="inline deleteForm" style="margin:0;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="button" onclick="openDeleteModal('{{ addslashes($dept->name) }}', this.form)" class="w-8 h-8 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/30 dark:hover:border-red-800 transition-colors">
+                                <button type="button" onclick="openRmDeleteModal('{{ addslashes($dept->name) }}', this.form)" class="w-8 h-8 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/30 dark:hover:border-red-800 transition-colors">
                                     <i class="fas fa-trash-can text-xs"></i>
                                 </button>
                             </form>
@@ -322,7 +334,7 @@
                                         <form method="POST" action="{{ route('admin.role-management.designations.destroy', $desig) }}" class="inline deleteForm" style="margin:0;">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="button" onclick="openDeleteModal('{{ addslashes($desig->title) }}', this.form)" class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors" title="Delete">
+                                            <button type="button" onclick="openRmDeleteModal('{{ addslashes($desig->title) }}', this.form)" class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors" title="Delete">
                                                 <i class="fas fa-trash-can text-xs"></i>
                                             </button>
                                         </form>
@@ -359,7 +371,7 @@
                             <form method="POST" action="{{ route('admin.role-management.designations.destroy', $desig) }}" class="inline deleteForm" style="margin:0;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="button" onclick="openDeleteModal('{{ addslashes($desig->title) }}', this.form)" class="w-8 h-8 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/30 dark:hover:border-red-800 transition-colors">
+                                <button type="button" onclick="openRmDeleteModal('{{ addslashes($desig->title) }}', this.form)" class="w-8 h-8 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/30 dark:hover:border-red-800 transition-colors">
                                     <i class="fas fa-trash-can text-xs"></i>
                                 </button>
                             </form>
@@ -575,18 +587,26 @@
     </div>
 
     {{-- ═════ Delete Confirmation Modal ═════ --}}
-    <div id="deleteConfirmModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-sm w-full animate-scale-in transition-colors">
-            <div class="p-5 text-center">
-                <div class="w-12 h-12 rounded-full bg-red-50 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-exclamation-triangle text-red-500 text-lg"></i>
+    <div id="deleteConfirmModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm transition-opacity">
+        <div class="absolute inset-0 bg-black/40"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4 animate-scale-in transition-colors z-10">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/30 flex items-center justify-center">
+                    <i class="fas fa-trash-can text-red-500 dark:text-red-400"></i>
                 </div>
-                <h2 class="text-base font-bold text-gray-900 dark:text-white mb-1">Confirm Delete</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Are you sure you want to delete <span id="deleteItemName" class="font-semibold text-gray-700 dark:text-gray-200">this item</span>? This action cannot be undone.</p>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Confirm Delete</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">This cannot be undone</p>
+                </div>
             </div>
-            <div class="border-t border-gray-100 dark:border-gray-700 px-5 py-3 flex gap-2 justify-end">
-                <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</button>
-                <button type="button" onclick="confirmDelete()" class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition">Delete</button>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-5">
+                Are you sure you want to delete <strong id="deleteItemName" class="text-gray-900 dark:text-white">this item</strong>? This action will permanently remove it and all associated data.
+            </p>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeRmDeleteModal()" class="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition">Cancel</button>
+                <button type="button" onclick="confirmRmDelete()" class="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg font-medium transition flex items-center gap-2">
+                    <span>Delete</span>
+                </button>
             </div>
         </div>
     </div>
@@ -672,18 +692,18 @@
 
     // ─── Delete ───
     let deleteFormRef = null;
-    function openDeleteModal(name, form) {
+    window.openRmDeleteModal = function(name, form) {
         document.getElementById('deleteItemName').textContent = name;
         deleteFormRef = form;
         document.getElementById('deleteConfirmModal').classList.remove('hidden');
-    }
-    function closeDeleteModal() {
+    };
+    window.closeRmDeleteModal = function() {
         document.getElementById('deleteConfirmModal').classList.add('hidden');
         deleteFormRef = null;
-    }
-    function confirmDelete() {
+    };
+    window.confirmRmDelete = function() {
         if (deleteFormRef) deleteFormRef.submit();
-    }
+    };
 
     // ─── Close modals on Escape ───
     document.addEventListener('keydown', function(e) {

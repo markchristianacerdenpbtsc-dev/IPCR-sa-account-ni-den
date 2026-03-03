@@ -98,15 +98,29 @@ window.closeConfirmationModal = function () {
     if (modal) modal.classList.add('hidden');
     pendingDeleteUserForm = null;
 };
-window.confirmDelete = function () { // Overloaded name, checking context
-    if (pendingDeleteUserForm) {
-        pendingDeleteUserForm.submit();
-    } else if (typeof deleteBackupForm !== 'undefined' && deleteBackupForm) {
-        // Fallback for database delete if they share the same function name
+window.confirmDelete = function () {
+    // Check which modal is currently visible to decide what action to take
+    const deleteModal = document.getElementById('deleteModal');
+    const confirmationModal = document.getElementById('confirmationModal');
+
+    if (deleteModal && !deleteModal.classList.contains('hidden') && deleteBackupForm) {
+        // Database backup delete
         deleteBackupForm.submit();
+        window.closeDeleteModal();
+    } else if (confirmationModal && !confirmationModal.classList.contains('hidden') && pendingDeleteUserForm) {
+        // User delete
+        pendingDeleteUserForm.submit();
+        window.closeConfirmationModal();
+    } else {
+        // Fallback: try each in order
+        if (deleteBackupForm) {
+            deleteBackupForm.submit();
+            if (window.closeDeleteModal) window.closeDeleteModal();
+        } else if (pendingDeleteUserForm) {
+            pendingDeleteUserForm.submit();
+            window.closeConfirmationModal();
+        }
     }
-    window.closeConfirmationModal();
-    if (window.closeDeleteModal) window.closeDeleteModal(); // for database
 };
 
 // Add User Modal
@@ -158,10 +172,18 @@ window.openDeleteModal = function (filename, form) { // Specific to database
     document.getElementById('deleteModal').classList.remove('hidden');
 };
 window.closeDeleteModal = function () {
-    document.getElementById('deleteModal').classList.add('hidden');
+    const modal = document.getElementById('deleteModal');
+    if (modal) modal.classList.add('hidden');
     deleteBackupForm = null;
 };
 // confirmDelete is shared/handled above
+
+// Reset stale form references when navigating away (Turbo)
+document.addEventListener('turbo:before-visit', function () {
+    pendingDeleteUserForm = null;
+    deleteBackupForm = null;
+    restoreBackupForm = null;
+});
 
 window.openSettingsModal = function () {
     document.getElementById('settingsModal').classList.remove('hidden');

@@ -82,6 +82,12 @@ class RoleDesignationController extends Controller
 
     public function destroyRole(Role $role)
     {
+        // Prevent deleting the protected admin role
+        if (strtolower($role->name) === 'admin') {
+            return redirect()->route('admin.role-management.index', ['tab' => 'roles'])
+                ->with('error', 'The Admin role is protected and cannot be deleted.');
+        }
+
         // Prevent deleting roles that are assigned to users
         $userCount = $role->userRoles()->count();
         if ($userCount > 0) {

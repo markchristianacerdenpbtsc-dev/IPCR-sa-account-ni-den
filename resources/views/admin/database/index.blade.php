@@ -213,8 +213,9 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4 animate-scale-in transition-colors">
+    <div id="deleteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm transition-opacity">
+        <div class="absolute inset-0 bg-black/40"></div>
+        <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4 animate-scale-in transition-colors z-10">
             <div class="flex items-center gap-3 mb-4">
                 <div class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/30 flex items-center justify-center">
                     <i class="fas fa-trash-can text-red-500 dark:text-red-400"></i>
@@ -225,11 +226,13 @@
                 </div>
             </div>
             <p class="text-sm text-gray-600 dark:text-gray-300 mb-5">
-                Are you sure you want to delete <strong id="deleteFileName" class="text-gray-900 dark:text-white"></strong>?
+                Are you sure you want to delete <strong id="deleteFileName" class="text-gray-900 dark:text-white"></strong>? This action will permanently remove the backup file.
             </p>
             <div class="flex justify-end gap-2">
                 <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition">Cancel</button>
-                <button onclick="confirmDelete()" class="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg font-medium transition">Delete</button>
+                <button onclick="confirmDelete()" class="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg font-medium transition flex items-center gap-2">
+                    <span>Delete</span>
+                </button>
             </div>
         </div>
     </div>

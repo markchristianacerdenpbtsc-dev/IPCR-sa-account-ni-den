@@ -1436,6 +1436,92 @@
         const ipcrRoleLabel = @json(auth()->user()->designation->title ?? 'Faculty');
         const csrfToken = @json(csrf_token());
 
+        // =====================================================
+        // QETA Auto-Computation: A = average of Q, E, T
+        // =====================================================
+        function computeQetaAverage(row) {
+            const qInput = row.querySelector('.qeta-q');
+            const eInput = row.querySelector('.qeta-e');
+            const tInput = row.querySelector('.qeta-t');
+            const aInput = row.querySelector('.qeta-a');
+            if (!qInput || !eInput || !tInput || !aInput) return;
+
+            const q = parseFloat(qInput.value);
+            const e = parseFloat(eInput.value);
+            const t = parseFloat(tInput.value);
+
+            if (!isNaN(q) && !isNaN(e) && !isNaN(t)) {
+                aInput.value = ((q + e + t) / 3).toFixed(2);
+            } else {
+                aInput.value = '';
+            }
+        }
+
+        /**
+         * Retroactively label Q/E/T/A number inputs in data rows that were loaded
+         * from saved HTML (which doesn't have the qeta-* classes yet).
+         * Also makes A inputs readonly and recomputes existing averages.
+         * @param {HTMLElement} tableBody - The tbody element to process
+         */
+        function labelQetaInputs(tableBody) {
+            if (!tableBody) return;
+            const rows = tableBody.querySelectorAll('tr');
+            rows.forEach(row => {
+                // Skip section/header rows (they have bg-* classes or colspan)
+                if (row.classList.contains('bg-green-100') ||
+                    row.classList.contains('bg-purple-100') ||
+                    row.classList.contains('bg-orange-100') ||
+                    row.classList.contains('bg-blue-100') ||
+                    row.classList.contains('bg-gray-100') ||
+                    row.querySelector('td[colspan]')) {
+                    return;
+                }
+
+                // Get all cells in the data row
+                const cells = row.querySelectorAll('td');
+                // Data rows: MFO | SI | Accomplishments | Q | E | T | A | Remarks
+                // Indices:    0  | 1  |       2        | 3 | 4 | 5 | 6 |    7
+                if (cells.length >= 7) {
+                    const qInput = cells[3]?.querySelector('input[type="number"]');
+                    const eInput = cells[4]?.querySelector('input[type="number"]');
+                    const tInput = cells[5]?.querySelector('input[type="number"]');
+                    const aInput = cells[6]?.querySelector('input[type="number"]');
+
+                    if (qInput && !qInput.classList.contains('qeta-q')) qInput.classList.add('qeta-q');
+                    if (eInput && !eInput.classList.contains('qeta-e')) eInput.classList.add('qeta-e');
+                    if (tInput && !tInput.classList.contains('qeta-t')) tInput.classList.add('qeta-t');
+                    if (aInput && !aInput.classList.contains('qeta-a')) {
+                        aInput.classList.add('qeta-a');
+                        aInput.readOnly = true;
+                        aInput.style.backgroundColor = '#f3f4f6';
+                        aInput.title = 'Auto-computed average of Q, E, T';
+                    }
+
+                    // Recompute average for rows that already have values
+                    computeQetaAverage(row);
+                }
+            });
+        }
+
+        /**
+         * Setup event delegation for QETA auto-computation on a table body.
+         * Listens for input events on .qeta-q, .qeta-e, .qeta-t and recomputes A.
+         */
+        function setupQetaDelegation(tableBody) {
+            if (!tableBody || tableBody.dataset.qetaDelegated) return;
+            tableBody.dataset.qetaDelegated = 'true';
+
+            tableBody.addEventListener('input', function(e) {
+                const target = e.target;
+                if (target.classList.contains('qeta-q') ||
+                    target.classList.contains('qeta-e') ||
+                    target.classList.contains('qeta-t')) {
+                    const row = target.closest('tr');
+                    if (row) computeQetaAverage(row);
+                }
+            });
+        }
+
         window.openCreateIpcrModal = function() {
             const modal = document.getElementById('createIpcrModal');
             if (modal) {
@@ -2021,6 +2107,8 @@
                         
                         // Unhide columns for saved copy
                         unhideTableColumns();
+                        // Label QETA inputs and set up auto-computation
+                        labelQetaInputs(tableBody);
                     }
 
                     // Load title
@@ -2073,6 +2161,11 @@
                     }
                 });
             }
+
+            // Setup QETA event delegation on all table bodies
+            setupQetaDelegation(document.getElementById('ipcrTableBody'));
+            setupQetaDelegation(document.getElementById('opcrTableBody'));
+            setupQetaDelegation(document.getElementById('templatePreviewTableBody'));
         });
 
         window.addSectionHeader = function(headerText = '', isEditable = true) {
@@ -2244,16 +2337,16 @@
                     <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0" placeholder="Enter Actual Accomplishments"></textarea>
                 </td>
                 <td class="border border-gray-300 px-2 py-2${hiddenClass}">
-                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="1" max="5" step="1" placeholder="-">
+                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0 qeta-q" min="1" max="5" step="1" placeholder="-">
                 </td>
                 <td class="border border-gray-300 px-2 py-2${hiddenClass}">
-                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="1" max="5" step="1" placeholder="-">
+                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0 qeta-e" min="1" max="5" step="1" placeholder="-">
                 </td>
                 <td class="border border-gray-300 px-2 py-2${hiddenClass}">
-                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="1" max="5" step="1" placeholder="-">
+                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0 qeta-t" min="1" max="5" step="1" placeholder="-">
                 </td>
                 <td class="border border-gray-300 px-2 py-2${hiddenClass}">
-                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="1" max="5" step="1" placeholder="-">
+                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0 qeta-a" min="1" max="5" step="0.01" placeholder="-" readonly style="background-color: #f3f4f6;" title="Auto-computed average of Q, E, T">
                 </td>
                 <td class="border border-gray-300 px-2 py-2${hiddenClass}">
                     <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0" placeholder="Enter Remarks"></textarea>
@@ -2766,6 +2859,8 @@
 
                         document.getElementById('templatePreviewModal').classList.remove('hidden');
                         attachSoDocumentClickHandlers();
+                        // Label QETA inputs and set up auto-computation
+                        labelQetaInputs(document.getElementById('templatePreviewTableBody'));
                     } else {
                         showAlertModal('info', 'Legacy Template', 'This template was created with the old format. Please use the Edit button to modify it.');
                     }
@@ -3617,6 +3712,8 @@
 
                             document.getElementById('templatePreviewModal').classList.remove('hidden');
                             attachSoDocumentClickHandlers();
+                            // Label QETA inputs and set up auto-computation
+                            labelQetaInputs(document.getElementById('templatePreviewTableBody'));
                         } else {
                             showAlertModal('info', 'Legacy Template', 'This template was created with the old format. Please use the Edit button to modify it.');
                         }
@@ -3695,6 +3792,9 @@
                                 });
                             });
                         }
+
+                        // Label QETA inputs and set up auto-computation
+                        labelQetaInputs(tableBody);
 
                         // Load title
                         const titleElement = document.getElementById('templatePreviewTitle');
@@ -4093,16 +4193,16 @@
                     <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0" placeholder="Enter Actual Accomplishments"></textarea>
                 </td>
                 <td class="border border-gray-300 px-2 py-2${hiddenClass}">
-                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="1" max="5" step="1" placeholder="-">
+                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0 qeta-q" min="1" max="5" step="1" placeholder="-">
                 </td>
                 <td class="border border-gray-300 px-2 py-2${hiddenClass}">
-                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="1" max="5" step="1" placeholder="-">
+                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0 qeta-e" min="1" max="5" step="1" placeholder="-">
                 </td>
                 <td class="border border-gray-300 px-2 py-2${hiddenClass}">
-                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="1" max="5" step="1" placeholder="-">
+                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0 qeta-t" min="1" max="5" step="1" placeholder="-">
                 </td>
                 <td class="border border-gray-300 px-2 py-2${hiddenClass}">
-                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0" min="1" max="5" step="1" placeholder="-">
+                    <input type="number" class="w-full h-20 px-2 py-1 text-xs text-center border-0 focus:ring-0 qeta-a" min="1" max="5" step="0.01" placeholder="-" readonly style="background-color: #f3f4f6;" title="Auto-computed average of Q, E, T">
                 </td>
                 <td class="border border-gray-300 px-2 py-2${hiddenClass}">
                     <textarea class="w-full h-20 px-2 py-1 text-xs resize-none border-0 focus:ring-0" placeholder="Enter Remarks"></textarea>
@@ -4370,6 +4470,8 @@
                         
                         // Unhide columns for saved copy
                         unhideOpcrTableColumns();
+                        // Label QETA inputs and set up auto-computation
+                        labelQetaInputs(tableBody);
                     }
                     
                     document.getElementById('opcrDocumentContainer').classList.remove('hidden');
@@ -5024,6 +5126,8 @@
                     if (tableBody && template.table_body_html) {
                         tableBody.innerHTML = template.table_body_html;
                         unhideOpcrTableColumns();
+                        // Label QETA inputs and set up auto-computation
+                        labelQetaInputs(tableBody);
                     }
                     
                     document.getElementById('createOpcrButtonArea').style.display = 'none';
@@ -5098,6 +5202,8 @@
 
                         document.getElementById('templatePreviewModal').classList.remove('hidden');
                         attachSoDocumentClickHandlers();
+                        // Label QETA inputs and set up auto-computation
+                        labelQetaInputs(document.getElementById('templatePreviewTableBody'));
                     } else {
                         showAlertModal('info', 'Legacy Template', 'This template was created with the old format.');
                     }
@@ -5266,6 +5372,9 @@
                             });
                         });
                     }
+
+                    // Label QETA inputs and set up auto-computation
+                    labelQetaInputs(tableBody);
 
                     // Load title
                     var titleElement = document.getElementById('templatePreviewTitle');
