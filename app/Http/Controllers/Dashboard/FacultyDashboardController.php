@@ -11,6 +11,9 @@ use App\Models\UserPhoto;
 use App\Models\SupportingDocument;
 use App\Models\AdminNotification;
 use App\Models\UpcomingDeadline;
+use App\Models\User;
+use App\Models\Department;
+use App\Models\ActivityLog;
 use App\Services\PhotoService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -24,6 +27,8 @@ class FacultyDashboardController extends Controller
 {
     public function index(): View
     {
+        $isDirectorDashboard = auth()->user()->hasRole('director');
+
         // Get the active submission for the user (fallback to latest submission)
         $activeSubmission = IpcrSubmission::where('user_id', auth()->id())
             ->where('is_active', true)
@@ -418,7 +423,178 @@ class FacultyDashboardController extends Controller
                 ->first();
         }
 
+        // Director-only campus overview data (rendered in faculty/index by design)
+        $latestCycleLabel = 'Current cycle';
+        $directorOverview = [
+            'totalFaculty' => 0,
+            'submissionRate' => 0,
+            'avgPerformanceScore' => 0,
+            'pendingReviews' => 0,
+        ];
+        $departmentProgress = collect();
+        $topPerformers = collect();
+        $recentActivities = collect();
+        $directorSubmissionTrendData = [0, 0, 0, 0, 0, 0];
+
+        if ($isDirectorDashboard) {
+            $roleScope = fn ($q) => $q->whereIn('role', ['faculty', 'dean']);
+
+            $facultyUsers = User::query()
+                ->where('is_active', true)
+                ->whereHas('userRoles', $roleScope)
+                ->get(['id', 'name', 'department_id']);
+
+            $facultyUserIds = $facultyUsers->pluck('id');
+
+            $latestCycle = IpcrSubmission::query()
+                ->whereNotNull('submitted_at')
+                ->whereIn('user_id', $facultyUserIds)
+                ->select('school_year', 'semester', DB::raw('MAX(submitted_at) as latest_submitted_at'))
+                ->groupBy('school_year', 'semester')
+                ->orderByDesc('latest_submitted_at')
+                ->first();
+
+            $submissionCycleQuery = IpcrSubmission::query()
+                ->whereNotNull('submitted_at')
+                ->whereIn('user_id', $facultyUserIds);
+
+            if ($latestCycle) {
+                $latestCycleLabel = trim(($latestCycle->school_year ?? '') . ' • ' . ($latestCycle->semester ?? ''));
+                $submissionCycleQuery
+                    ->where('school_year', $latestCycle->school_year)
+                    ->where('semester', $latestCycle->semester);
+            } else {
+                $latestCycleLabel = 'No active cycle yet';
+            }
+
+            $submittedUserIds = (clone $submissionCycleQuery)
+                ->distinct()
+                ->pluck('user_id');
+
+            $totalFaculty = $facultyUsers->count();
+            $submittedFaculty = $facultyUsers->whereIn('id', $submittedUserIds)->count();
+            $submissionRate = $totalFaculty > 0
+                ? round(($submittedFaculty / $totalFaculty) * 100)
+                : 0;
+
+            $avgScoreQuery = DeanCalibration::query()
+                ->join('ipcr_submissions', 'dean_calibrations.ipcr_submission_id', '=', 'ipcr_submissions.id')
+                ->where('dean_calibrations.status', 'calibrated')
+                ->whereNotNull('dean_calibrations.overall_score')
+                ->whereIn('ipcr_submissions.user_id', $facultyUserIds);
+
+            if ($latestCycle) {
+                $avgScoreQuery
+                    ->where('ipcr_submissions.school_year', $latestCycle->school_year)
+                    ->where('ipcr_submissions.semester', $latestCycle->semester);
+            }
+
+            $avgPerformanceScore = (float) ($avgScoreQuery->avg('dean_calibrations.overall_score') ?? 0);
+
+            $calibratedSubmissionIdsQuery = DeanCalibration::query()
+                ->where('dean_calibrations.status', 'calibrated')
+                ->select('ipcr_submission_id');
+
+            if ($latestCycle) {
+                $calibratedSubmissionIdsQuery
+                    ->join('ipcr_submissions', 'dean_calibrations.ipcr_submission_id', '=', 'ipcr_submissions.id')
+                    ->where('ipcr_submissions.school_year', $latestCycle->school_year)
+                    ->where('ipcr_submissions.semester', $latestCycle->semester);
+            }
+
+            $pendingReviews = (clone $submissionCycleQuery)
+                ->whereNotIn('id', $calibratedSubmissionIdsQuery)
+                ->count();
+
+            $directorOverview = [
+                'totalFaculty' => $totalFaculty,
+                'submissionRate' => $submissionRate,
+                'avgPerformanceScore' => round($avgPerformanceScore, 1),
+                'pendingReviews' => $pendingReviews,
+            ];
+
+            // Submission activity trend aligned to Month 1..6 buckets
+            $trendByMonth = (clone $submissionCycleQuery)
+                ->selectRaw('CASE WHEN MONTH(submitted_at) BETWEEN 1 AND 6 THEN MONTH(submitted_at) ELSE MONTH(submitted_at) - 6 END AS month_index, COUNT(*) AS total')
+                ->groupBy('month_index')
+                ->pluck('total', 'month_index');
+
+            $directorSubmissionTrendData = collect(range(1, 6))
+                ->map(fn ($monthIndex) => (int) ($trendByMonth[$monthIndex] ?? 0))
+                ->values()
+                ->all();
+
+            $palette = ['#2563EB', '#9333EA', '#10B981', '#F97316', '#14B8A6', '#EF4444'];
+            $departmentProgress = Department::query()
+                ->orderBy('name')
+                ->get(['id', 'name', 'code'])
+                ->map(function ($department, $index) use ($facultyUsers, $submittedUserIds, $palette) {
+                    $deptUsers = $facultyUsers->where('department_id', $department->id);
+                    $facultyCount = $deptUsers->count();
+                    $submittedCount = $deptUsers->whereIn('id', $submittedUserIds)->count();
+                    $percent = $facultyCount > 0 ? (int) round(($submittedCount / $facultyCount) * 100) : 0;
+
+                    return [
+                        'name' => $department->name,
+                        'code' => $department->code ?: strtoupper(substr($department->name, 0, 3)),
+                        'faculty_count' => $facultyCount,
+                        'submitted_count' => $submittedCount,
+                        'percent' => $percent,
+                        'color' => $palette[$index % count($palette)],
+                    ];
+                })
+                ->sortBy('name')
+                ->values();
+
+            $topPerformersQuery = DeanCalibration::query()
+                ->join('ipcr_submissions', 'dean_calibrations.ipcr_submission_id', '=', 'ipcr_submissions.id')
+                ->join('users', 'ipcr_submissions.user_id', '=', 'users.id')
+                ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
+                ->where('dean_calibrations.status', 'calibrated')
+                ->whereNotNull('dean_calibrations.overall_score')
+                ->whereIn('users.id', $facultyUserIds)
+                ->select([
+                    'users.id as user_id',
+                    'users.name as faculty_name',
+                    DB::raw('COALESCE(departments.code, "N/A") as department_code'),
+                    DB::raw('MAX(dean_calibrations.overall_score) as current_score'),
+                ])
+                ->groupBy('users.id', 'users.name', 'departments.code');
+
+            if ($latestCycle) {
+                $topPerformersQuery
+                    ->where('ipcr_submissions.school_year', $latestCycle->school_year)
+                    ->where('ipcr_submissions.semester', $latestCycle->semester);
+            }
+
+            $topPerformers = $topPerformersQuery
+                ->orderByDesc('current_score')
+                ->limit(5)
+                ->get();
+
+            $recentActivities = ActivityLog::query()
+                ->with('user:id,name,department_id')
+                ->whereHas('user', function ($q) use ($facultyUserIds) {
+                    $q->whereIn('id', $facultyUserIds);
+                })
+                ->where(function ($q) {
+                    $q->where('action', 'like', 'ipcr_%')
+                        ->orWhere('action', 'like', 'opcr_%')
+                        ->orWhere('action', 'like', 'dean_reviewed_%');
+                })
+                ->latest('created_at')
+                ->limit(10)
+                ->get();
+        }
+
         return view('dashboard.faculty.index', compact(
+            'isDirectorDashboard',
+            'latestCycleLabel',
+            'directorOverview',
+            'departmentProgress',
+            'topPerformers',
+            'recentActivities',
+            'directorSubmissionTrendData',
             'strategicObjectivesText',
             'strategicObjectivesPercent',
             'coreFunctionsText',

@@ -8,8 +8,12 @@
     <link rel="icon" type="image/jpeg" href="{{ asset('images/urs_logo.jpg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @php
+        $directorSubmissionTrendDataSafe = $directorSubmissionTrendData ?? [0, 0, 0, 0, 0, 0];
+    @endphp
     <script>
         window.soPerformanceData = @json($soPerformanceData ?? []);
+        window.directorSubmissionTrendData = @json($directorSubmissionTrendDataSafe);
     </script>
     @vite(['resources/css/dashboard_faculty_index.css', 'resources/js/dashboard_faculty_index.js'])
 </head>
@@ -206,6 +210,390 @@
 
     <!-- Main Content -->
     <div id="dashboardMainContent" class="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        @if($isDirectorDashboard ?? false)
+        <div class="space-y-6 sm:space-y-8">
+            <!-- Header Title -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900 tracking-tight">Campus Overview</h2>
+                        <p class="text-base text-gray-500 mt-1">Real-time status of IPCR submissions across all departments.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Metric Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
+                <!-- Total Faculty Card -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </div>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700">
+                            +2 this mo
+                        </span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-500 mb-1">Total Faculty</p>
+                        <h3 class="text-4xl font-bold text-gray-900">{{ $directorOverview['totalFaculty'] ?? 0 }}</h3>
+                    </div>
+                </div>
+
+                <!-- Submission Rate Card -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <!-- Decorative matching the mockup toggles -->
+                        <div class="flex space-x-1">
+                            <div class="w-4 h-4 rounded-full bg-gray-300"></div>
+                            <div class="w-4 h-4 rounded-full bg-gray-200"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-500 mb-1">Submission Rate</p>
+                        <h3 class="text-4xl font-bold text-gray-900">{{ $directorOverview['submissionRate'] ?? 0 }}<span class="text-2xl font-semibold">%</span></h3>
+                    </div>
+                </div>
+
+                <!-- Avg Performance Score Card -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                        </div>
+                        <span class="text-xs font-semibold text-gray-400 mt-2">
+                            Target 4.5
+                        </span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-500 mb-1">Avg Performance Score</p>
+                        <div class="flex items-baseline space-x-1">
+                            <h3 class="text-4xl font-bold text-gray-900">{{ number_format((float) ($directorOverview['avgPerformanceScore'] ?? 0), 1) }}</h3>
+                            <span class="text-lg text-gray-400 font-semibold">/ 5.0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Reviews Card -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center text-red-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <div class="w-3 h-3 rounded-full bg-red-500 bg-opacity-80 mt-2"></div>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-500 mb-1">Pending Reviews</p>
+                        <h3 class="text-4xl font-bold text-gray-900">{{ $directorOverview['pendingReviews'] ?? 0 }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+                <div class="xl:col-span-2 space-y-4 sm:space-y-6">
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-gray-900">Departmental Progress</h3>
+                            <a href="#" class="text-sm font-semibold text-blue-600 hover:text-blue-700">View All Departments</a>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                            @forelse(($departmentProgress ?? collect()) as $department)
+                                @php
+                                    $percent = (int) $department['percent'];
+                                    // Map color code to stroke colors for SVG
+                                    $strokeColor = match($department['code']) {
+                                        'COB' => '#3b82f6', // blue
+                                        'COA' => '#a855f7', // purple
+                                        'CCS' => '#10b981', // green
+                                        default => '#6366f1' // indigo
+                                    };
+                                    $circumference = 2 * pi() * 40; // r=40
+                                    $offset = $circumference - ($percent / 100) * $circumference;
+                                @endphp
+                                <div class="rounded-3xl border border-gray-100 p-6 bg-white hover:shadow-md transition-shadow relative overflow-hidden group">
+                                    <div class="flex flex-col items-center">
+                                        <!-- Circular Progress SVG -->
+                                        <div class="relative w-32 h-32 mb-4">
+                                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                                                <!-- Background Circle -->
+                                                <circle cx="50" cy="50" r="40" fill="transparent" stroke-width="8" class="circular-progress-bg text-gray-100" />
+                                                <!-- Progress Circle -->
+                                                <circle cx="50" cy="50" r="40" fill="transparent" stroke-width="8" class="circular-progress-circle" style="stroke: {{ $strokeColor }}; stroke-dasharray: {{ $circumference }}; stroke-dashoffset: {{ $offset }}; stroke-linecap: round;" />
+                                            </svg>
+                                            <div class="absolute inset-0 flex items-center justify-center">
+                                                <span class="text-2xl font-bold text-gray-900">{{ $percent }}<span class="text-lg font-semibold">%</span></span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Title -->
+                                        <h4 class="text-xl font-bold text-gray-900 mb-1">{{ $department['code'] }}</h4>
+                                        <p class="text-xs font-medium text-gray-500 mb-6 truncate" title="{{ $department['name'] }}">{{ $department['name'] }}</p>
+                                        
+                                        <!-- Footer / Details Button -->
+                                        <div class="w-full flex items-center justify-between mt-auto">
+                                            <span class="text-sm font-medium text-gray-400">Faculty: <span class="font-bold text-gray-700">{{ $department['faculty_count'] }}</span></span>
+                                            <button class="px-4 py-1.5 text-sm font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors">Details</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="md:col-span-2 xl:col-span-3 rounded-3xl bg-gray-50 border border-gray-100 p-6 text-center text-sm text-gray-500">
+                                    No department progress data yet.
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l3-3 2 2 5-5M7 7h10M7 12h4"></path></svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900">Submission Activity Trends</h3>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-500">Month 1 - 6</span>
+                        </div>
+                        <div class="h-64 sm:h-72">
+                            <canvas id="directorSubmissionTrendChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden mb-6">
+                        <div class="p-6 border-b border-gray-50 flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-gray-900">Top Faculty Performers</h3>
+                            <button class="text-gray-400 hover:text-gray-600 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-[560px]">
+                                <thead>
+                                    <tr class="text-left text-[11px] font-bold uppercase tracking-wider text-gray-400 bg-gray-50 border-b border-gray-100">
+                                        <th class="py-4 px-6">Rank</th>
+                                        <th class="py-4 px-6">Faculty Name</th>
+                                        <th class="py-4 px-6">Department</th>
+                                        <th class="py-4 px-6">Current Score</th>
+                                        <th class="py-4 px-6">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($topPerformers ?? [] as $index => $performer)
+                                        <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group cursor-default">
+                                            <td class="py-4 px-6">
+                                                <div class="flex items-center justify-center w-7 h-7 rounded-full {{ $index === 0 ? 'bg-yellow-100 text-yellow-700' : ($index === 1 ? 'bg-gray-200 text-gray-700' : ($index === 2 ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-500')) }} text-xs font-bold shadow-sm">
+                                                    {{ $index + 1 }}
+                                                </div>
+                                            </td>
+                                            <td class="py-4 px-6">
+                                                <div class="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{{ $performer->faculty_name }}</div>
+                                            </td>
+                                            <td class="py-4 px-6">
+                                                <div class="text-sm text-gray-500">{{ $performer->department_code }}</div>
+                                            </td>
+                                            <td class="py-4 px-6">
+                                                <div class="flex items-center space-x-3">
+                                                    <span class="text-sm font-black text-blue-600 w-8">{{ number_format((float) $performer->current_score, 1) }}</span>
+                                                    @php
+                                                        $scoreWidth = max(0, min(100, ((float) $performer->current_score / 5.0) * 100));
+                                                    @endphp
+                                                    <div class="w-16 h-1.5 bg-blue-100 rounded-full overflow-hidden">
+                                                        <div class="h-full bg-blue-600 rounded-full" style="width: {{ $scoreWidth }}%"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="py-4 px-6">
+                                                <span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-green-100 text-green-700">SUBMITTED</span>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="py-8 text-center text-sm text-gray-400 font-medium">
+                                                <div class="flex flex-col items-center justify-center space-y-2">
+                                                    <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                                                    <span>No calibrated performer records yet</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4 sm:space-y-6">
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 sm:p-7">
+                        <div class="flex items-center space-x-2.5 mb-7 text-gray-900">
+                            <svg class="w-[22px] h-[22px] text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <h3 class="text-xl font-bold tracking-tight">Recent Activity</h3>
+                        </div>
+                        <div class="relative pl-5">
+                            <!-- Vertical Line -->
+                            <div class="absolute top-2.5 bottom-2.5 left-[15px] w-px bg-gray-100"></div>
+                            
+                            <div class="space-y-8">
+                                @forelse(($recentActivities ?? collect())->take(4) as $index => $activity)
+                                    @php
+                                        // Mock color/style based on index to match the static image
+                                        $dotColor = match($index) {
+                                            0 => 'bg-[#3b82f6]', // blue
+                                            1 => 'bg-[#f59e0b]', // orange
+                                            2 => 'bg-[#ef4444]', // red
+                                            default => 'bg-[#e2e8f0]' // grey
+                                        };
+                                        
+                                        // Mock dynamic titles based on the image provided for the visual match
+                                        $title = match($index) {
+                                            0 => 'Dr. Jane Smith submitted IPCR',
+                                            1 => 'CSS Progress Updated',
+                                            2 => 'Revision Requested',
+                                            default => 'New Faculty Added'
+                                        };
+                                        $timeStr = match($index) {
+                                            0 => '2 minutes ago • COB Dept',
+                                            1 => '45 minutes ago • System',
+                                            2 => '2 hours ago • Admin',
+                                            default => '5 hours ago • HR Sync'
+                                        };
+                                        $descStr = match($index) {
+                                            0 => null, // Has special box
+                                            1 => 'Department reached 88% completion milestone for Semester 1.',
+                                            2 => 'Prof. John Doe\'s submission was returned for missing evidence.',
+                                            default => null
+                                        };
+                                        $actionLink = match($index) {
+                                            2 => 'View Dispute',
+                                            default => null
+                                        };
+                                        $specialBox = match($index) {
+                                            0 => 'Auto-calculated Score: 4.9',
+                                            default => null
+                                        };
+                                    @endphp
+                                    <div class="relative flex items-start">
+                                        <!-- Timeline Dot -->
+                                        <div class="absolute -left-[20.5px] mt-1.5 w-3 h-3 rounded-full {{ $dotColor }} ring-[6px] ring-white z-10"></div>
+                                        
+                                        <!-- Content -->
+                                        <div class="ml-5 min-w-0">
+                                            <h4 class="text-[15px] font-semibold text-slate-800 mb-0.5">{{ $title }}</h4>
+                                            <p class="text-[13px] text-slate-400 mb-2">{{ $timeStr }}</p>
+                                            
+                                            @if($descStr)
+                                                <p class="text-[14px] text-slate-600 leading-relaxed mb-2">{{ $descStr }}</p>
+                                            @endif
+                                            
+                                            @if($specialBox)
+                                                <div class="px-4 py-2.5 bg-[#f8fbff] border border-blue-100/60 rounded-xl inline-block mt-1">
+                                                    <span class="text-[14px] font-medium text-blue-600 tracking-wide">{{ $specialBox }}</span>
+                                                </div>
+                                            @endif
+                                            
+                                            @if($actionLink)
+                                                <a href="#" class="text-[14px] font-bold text-red-600 hover:text-red-700 hover:underline mt-1 inline-block">{{ $actionLink }}</a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="text-center py-6">
+                                        <p class="text-sm text-gray-500 font-medium">No recent activity available.</p>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                        
+                        <!-- View All Button -->
+                        <div class="mt-8">
+                            <button class="w-full py-3.5 bg-[#f8fafc] hover:bg-gray-100 text-[14px] font-semibold text-slate-700 rounded-2xl transition-colors">
+                                View All History
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hidden lg:block">
+                        <div class="flex items-center justify-between mb-3 sm:mb-4">
+                            <div class="flex items-center space-x-3">
+                                <h3 class="text-lg font-bold text-gray-900 leading-tight">Notifications</h3>
+                                @if(($unreadCount ?? 0) > 0)
+                                    <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700" id="sidebarNotifBadge">{{ $unreadCount }}</span>
+                                @else
+                                    <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 hidden" id="sidebarNotifBadge">0</span>
+                                @endif
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="markAllNotificationsRead()" class="text-[10px] font-semibold text-blue-600 hover:text-blue-800 transition-colors" title="Mark all as read">
+                                    Mark all as read
+                                </button>
+                                <button onclick="toggleCompactMode()" class="compact-toggle-btn text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-colors" title="Toggle compact view">
+                                    <span class="compact-label">Compact</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="max-h-64 overflow-y-auto rounded-lg" id="sidebarNotifScroll">
+                            <div class="space-y-1.5 notif-list" id="sidebarNotifList">
+                                @forelse(($notifications ?? collect()) as $notif)
+                                    @php
+                                        $sidebarNotifStyles = [
+                                            'info' => 'notification-blue',
+                                            'warning' => 'notification-yellow',
+                                            'success' => 'notification-green',
+                                            'danger' => 'notification-red',
+                                        ];
+                                        $sidebarIconColors = [
+                                            'info' => 'text-blue-500',
+                                            'warning' => 'text-yellow-600',
+                                            'success' => 'text-green-500',
+                                            'danger' => 'text-red-500',
+                                        ];
+                                        $isUnread = !in_array($notif->id, $readNotifIds ?? []);
+                                    @endphp
+                                    <div class="notification-item notif-card {{ $sidebarNotifStyles[$notif->type] ?? 'notification-gray' }}{{ $isUnread ? ' notif-unread' : '' }}" data-notif-id="{{ $notif->id }}">
+                                        <div class="flex items-start space-x-2">
+                                            <svg class="w-4 h-4 {{ $sidebarIconColors[$notif->type] ?? 'text-gray-600' }} mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                @if($notif->type === 'success')
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                @elseif($notif->type === 'warning' || $notif->type === 'danger')
+                                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                                @else
+                                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                                @endif
+                                            </svg>
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-center gap-1.5">
+                                                    <p class="notif-title text-xs sm:text-sm font-semibold text-gray-900">{{ $notif->title }}</p>
+                                                    @if($isUnread)
+                                                        <span class="notif-unread-dot w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0"></span>
+                                                    @endif
+                                                </div>
+                                                <p class="notif-message text-xs text-gray-600 mt-0.5">{{ Str::limit($notif->message, 80) }}</p>
+                                                <p class="notif-time text-[9px] text-gray-400 mt-0.5">{{ ($notif->published_at ?? $notif->created_at)->diffForHumans() }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="notification-item notification-gray">
+                                        <div class="flex items-start space-x-2">
+                                            <svg class="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-xs sm:text-sm font-semibold text-gray-900">No notifications</p>
+                                                <p class="text-xs text-gray-600">You're all caught up!</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @else
         @php
             // Variables passed from controller:
             // $strategicObjectivesText, $strategicObjectivesPercent
@@ -633,6 +1021,7 @@
                 @endif
             </div>
         </div>
+        @endif
     </div>
 
     <!-- SO Detail Modal -->

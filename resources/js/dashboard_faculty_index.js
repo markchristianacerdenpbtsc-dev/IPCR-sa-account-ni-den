@@ -2,6 +2,7 @@
 window.toggleMobileMenu = function () {
     const menu = document.querySelector('.mobile-menu');
     const overlay = document.querySelector('.mobile-menu-overlay');
+    if (!menu || !overlay) return;
     menu.classList.toggle('active');
     overlay.classList.toggle('active');
 };
@@ -9,6 +10,7 @@ window.toggleMobileMenu = function () {
 // Notification popup toggle
 window.toggleNotificationPopup = function () {
     const popup = document.getElementById('notificationPopup');
+    if (!popup) return;
     popup.classList.toggle('active');
 };
 
@@ -22,8 +24,95 @@ document.addEventListener('click', function (e) {
     }
 });
 
+// Director: Submission Activity Trends (Month 1..6)
+const directorTrendCanvas = document.getElementById('directorSubmissionTrendChart');
+if (directorTrendCanvas && typeof Chart !== 'undefined') {
+    const directorTrendCtx = directorTrendCanvas.getContext('2d');
+    const trendData = Array.isArray(window.directorSubmissionTrendData)
+        ? window.directorSubmissionTrendData.map(v => Number(v) || 0)
+        : [0, 0, 0, 0, 0, 0];
+
+    const trendGradient = directorTrendCtx.createLinearGradient(0, 0, 0, 280);
+    trendGradient.addColorStop(0, 'rgba(37, 99, 235, 0.25)');
+    trendGradient.addColorStop(1, 'rgba(37, 99, 235, 0.02)');
+
+    new Chart(directorTrendCtx, {
+        type: 'line',
+        data: {
+            labels: ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6'],
+            datasets: [{
+                label: 'Daily Submissions',
+                data: trendData,
+                borderColor: '#2563EB',
+                backgroundColor: trendGradient,
+                fill: true,
+                tension: 0.35,
+                borderWidth: 3,
+                pointRadius: 5,
+                pointHoverRadius: 6,
+                pointBackgroundColor: '#2563EB',
+                pointBorderColor: '#FFFFFF',
+                pointBorderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    align: 'end',
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        boxWidth: 8,
+                        color: '#64748B',
+                        font: {
+                            size: 11,
+                            weight: '700'
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Submissions: ' + (context.parsed.y ?? 0);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: '#94A3B8',
+                        font: {
+                            size: 11,
+                            weight: '700'
+                        }
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#EEF2FF' },
+                    ticks: {
+                        precision: 0,
+                        color: '#94A3B8',
+                        font: {
+                            size: 11,
+                            weight: '600'
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
 // Performance Chart — synced with submitted IPCR data, 0–5 rating scale
-const ctx = document.getElementById('performanceChart').getContext('2d');
+const chartCanvas = document.getElementById('performanceChart');
+const ctx = chartCanvas ? chartCanvas.getContext('2d') : null;
 const soData = window.soPerformanceData || [];
 
 function getFilteredData(section) {
@@ -38,139 +127,142 @@ function buildChartData(filtered) {
     return { labels, expected, actual };
 }
 
-const initial = buildChartData(soData);
+let performanceChart = null;
+if (ctx && typeof Chart !== 'undefined') {
+    const initial = buildChartData(soData);
 
-const gradientExpected = ctx.createLinearGradient(0, 0, 0, 350);
-gradientExpected.addColorStop(0, 'rgba(139, 92, 246, 0.6)'); // vibrant violet
-gradientExpected.addColorStop(1, 'rgba(139, 92, 246, 0.0)');
+    const gradientExpected = ctx.createLinearGradient(0, 0, 0, 350);
+    gradientExpected.addColorStop(0, 'rgba(139, 92, 246, 0.6)'); // vibrant violet
+    gradientExpected.addColorStop(1, 'rgba(139, 92, 246, 0.0)');
 
-const gradientActual = ctx.createLinearGradient(0, 0, 0, 350);
-gradientActual.addColorStop(0, 'rgba(14, 165, 233, 0.6)'); // energetic sky blue
-gradientActual.addColorStop(1, 'rgba(14, 165, 233, 0.0)');
+    const gradientActual = ctx.createLinearGradient(0, 0, 0, 350);
+    gradientActual.addColorStop(0, 'rgba(14, 165, 233, 0.6)'); // energetic sky blue
+    gradientActual.addColorStop(1, 'rgba(14, 165, 233, 0.0)');
 
-const performanceChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: initial.labels,
-        datasets: [{
-            label: 'Expected Target',
-            data: initial.expected,
-            borderColor: '#8B5CF6',
-            backgroundColor: gradientExpected,
-            borderWidth: 3,
-            pointBackgroundColor: '#ffffff',
-            pointBorderColor: '#8B5CF6',
-            pointBorderWidth: 2,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            fill: true,
-            tension: 0.4
-        }, {
-            label: 'Calibrated Rating',
-            data: initial.actual,
-            borderColor: '#0EA5E9',
-            backgroundColor: gradientActual,
-            borderWidth: 3,
-            pointBackgroundColor: '#ffffff',
-            pointBorderColor: '#0EA5E9',
-            pointBorderWidth: 2,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            fill: true,
-            tension: 0.4,
-            borderDash: [5, 5]
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-            mode: 'index',
-            intersect: false,
+    performanceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: initial.labels,
+            datasets: [{
+                label: 'Expected Target',
+                data: initial.expected,
+                borderColor: '#8B5CF6',
+                backgroundColor: gradientExpected,
+                borderWidth: 3,
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: '#8B5CF6',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.4
+            }, {
+                label: 'Calibrated Rating',
+                data: initial.actual,
+                borderColor: '#0EA5E9',
+                backgroundColor: gradientActual,
+                borderWidth: 3,
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: '#0EA5E9',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.4,
+                borderDash: [5, 5]
+            }]
         },
-        plugins: {
-            legend: {
-                display: true,
-                position: 'top',
-                align: 'end',
-                labels: {
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    align: 'end',
+                    labels: {
+                        usePointStyle: true,
+                        boxWidth: 8,
+                        padding: 20,
+                        font: {
+                            family: "'Inter', sans-serif",
+                            size: window.innerWidth < 640 ? 11 : 13,
+                            weight: '600'
+                        },
+                        color: '#4B5563'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    titleColor: '#1F2937',
+                    bodyColor: '#4B5563',
+                    titleFont: {
+                        family: "'Inter', sans-serif",
+                        size: 13,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        family: "'Inter', sans-serif",
+                        size: 12,
+                        weight: '500'
+                    },
+                    borderColor: '#E5E7EB',
+                    borderWidth: 1,
+                    padding: 12,
+                    boxPadding: 6,
                     usePointStyle: true,
-                    boxWidth: 8,
-                    padding: 20,
-                    font: {
-                        family: "'Inter', sans-serif",
-                        size: window.innerWidth < 640 ? 11 : 13,
-                        weight: '600'
-                    },
-                    color: '#4B5563'
-                }
-            },
-            tooltip: {
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                titleColor: '#1F2937',
-                bodyColor: '#4B5563',
-                titleFont: {
-                    family: "'Inter', sans-serif",
-                    size: 13,
-                    weight: 'bold'
-                },
-                bodyFont: {
-                    family: "'Inter', sans-serif",
-                    size: 12,
-                    weight: '500'
-                },
-                borderColor: '#E5E7EB',
-                borderWidth: 1,
-                padding: 12,
-                boxPadding: 6,
-                usePointStyle: true,
-                callbacks: {
-                    label: function(context) {
-                        return context.dataset.label + ': ' + context.parsed.y.toFixed(2);
-                    }
-                }
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                max: 5,
-                grid: {
-                    color: '#F3F4F6',
-                    drawBorder: false,
-                },
-                border: { display: false, dash: [4, 4] },
-                ticks: {
-                    stepSize: 1,
-                    padding: 10,
-                    color: '#9CA3AF',
-                    font: {
-                        family: "'Inter', sans-serif",
-                        size: window.innerWidth < 640 ? 10 : 12,
-                        weight: '500'
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.y.toFixed(2);
+                        }
                     }
                 }
             },
-            x: {
-                grid: {
-                    display: false,
-                },
-                border: { display: false },
-                ticks: {
-                    padding: 10,
-                    color: '#6B7280',
-                    font: {
-                        family: "'Inter', sans-serif",
-                        size: window.innerWidth < 640 ? 10 : 12,
-                        weight: '500'
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 5,
+                    grid: {
+                        color: '#F3F4F6',
+                        drawBorder: false,
                     },
-                    maxRotation: 45,
-                    minRotation: 0
+                    border: { display: false, dash: [4, 4] },
+                    ticks: {
+                        stepSize: 1,
+                        padding: 10,
+                        color: '#9CA3AF',
+                        font: {
+                            family: "'Inter', sans-serif",
+                            size: window.innerWidth < 640 ? 10 : 12,
+                            weight: '500'
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false,
+                    },
+                    border: { display: false },
+                    ticks: {
+                        padding: 10,
+                        color: '#6B7280',
+                        font: {
+                            family: "'Inter', sans-serif",
+                            size: window.innerWidth < 640 ? 10 : 12,
+                            weight: '500'
+                        },
+                        maxRotation: 45,
+                        minRotation: 0
+                    }
                 }
             }
         }
-    }
-});
+    });
+}
 
 // Section filter for chart + expected target list
 window.filterSection = function (section) {
@@ -181,10 +273,12 @@ window.filterSection = function (section) {
 
     // Filter chart data
     const filtered = buildChartData(getFilteredData(section));
-    performanceChart.data.labels = filtered.labels;
-    performanceChart.data.datasets[0].data = filtered.expected;
-    performanceChart.data.datasets[1].data = filtered.actual;
-    performanceChart.update();
+    if (performanceChart) {
+        performanceChart.data.labels = filtered.labels;
+        performanceChart.data.datasets[0].data = filtered.expected;
+        performanceChart.data.datasets[1].data = filtered.actual;
+        performanceChart.update();
+    }
 
     // Filter section groups in the expected target list
     document.querySelectorAll('.section-group').forEach(group => {

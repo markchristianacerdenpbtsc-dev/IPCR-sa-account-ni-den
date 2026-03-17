@@ -143,8 +143,15 @@ class DatabaseManagementController extends Controller
                 $dbName,
             ];
 
-            // Pass password via MYSQL_PWD environment variable (not on command line)
-            $env = !empty($dbPass) ? ['MYSQL_PWD' => $dbPass] : [];
+            // Inherit full OS environment and append MYSQL_PWD.
+            // On Windows, dropping core env vars can break TCP initialization in mysql client.
+            $env = getenv();
+            if (!is_array($env)) {
+                $env = [];
+            }
+            if (!empty($dbPass)) {
+                $env['MYSQL_PWD'] = $dbPass;
+            }
 
             $process = new Process($command, null, $env);
             $process->setTimeout(600);

@@ -84,7 +84,7 @@ class LoginController extends Controller
     {
         $route = match ($role) {
             'admin'    => 'admin.dashboard',
-            'director' => 'director.dashboard',
+            'director' => 'faculty.dashboard',
             default    => 'faculty.dashboard',
         };
 

@@ -63,7 +63,7 @@
     ]
   },
   "resources/css/dashboard_faculty_index.css": {
-    "file": "assets/dashboard_faculty_index-D3KkE_nj.css",
+    "file": "assets/dashboard_faculty_index-BnjNAbcM.css",
     "src": "resources/css/dashboard_faculty_index.css",
     "isEntry": true,
     "name": "dashboard_faculty_index",
@@ -126,7 +126,7 @@
     "isEntry": true
   },
   "resources/js/dashboard_faculty_index.js": {
-    "file": "assets/dashboard_faculty_index--H6GLkcj.js",
+    "file": "assets/dashboard_faculty_index-Du7Lt1hs.js",
     "name": "dashboard_faculty_index",
     "src": "resources/js/dashboard_faculty_index.js",
     "isEntry": true

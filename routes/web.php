@@ -5,7 +5,6 @@ use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\Dashboard\FacultyDashboardController;
 use App\Http\Controllers\Dashboard\DeanDashboardController;
-use App\Http\Controllers\Dashboard\DirectorDashboardController;
 use App\Http\Controllers\Dashboard\AdminDashboardController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\PhotoController;
@@ -85,43 +84,43 @@ Route::post('/email/verification/verify', [EmailVerificationController::class, '
 
 Route::get('/faculty/dashboard', [FacultyDashboardController::class, 'index'])
     ->name('faculty.dashboard')
-    ->middleware(['auth', 'role:faculty', 'permission:faculty.dashboard']);
+    ->middleware(['auth', 'role:faculty,director', 'permission:faculty.dashboard,director.dashboard']);
 
 Route::post('/faculty/notifications/mark-read', [FacultyDashboardController::class, 'markAllRead'])
     ->name('faculty.notifications.mark-read')
-    ->middleware(['auth', 'role:faculty']);
+    ->middleware(['auth', 'role:faculty,director']);
 
 Route::get('/faculty/my-ipcrs', [FacultyDashboardController::class, 'myIpcrs'])
     ->name('faculty.my-ipcrs')
-    ->middleware(['auth', 'role:faculty', 'permission:faculty.dashboard']);
+    ->middleware(['auth', 'role:faculty,director', 'permission:faculty.dashboard,director.dashboard']);
 
 Route::get('/faculty/profile', [FacultyDashboardController::class, 'profile'])
     ->name('faculty.profile')
-    ->middleware(['auth', 'role:faculty', 'permission:faculty.profile.manage']);
+    ->middleware(['auth', 'role:faculty,director', 'permission:faculty.profile.manage,director.dashboard']);
 
 Route::patch('/faculty/password/change', [FacultyDashboardController::class, 'changePassword'])
     ->name('faculty.password.change')
-    ->middleware(['auth', 'role:faculty', 'permission:faculty.profile.manage']);
+    ->middleware(['auth', 'role:faculty,director', 'permission:faculty.profile.manage,director.dashboard']);
 
 Route::patch('/faculty/profile/update', [FacultyDashboardController::class, 'updateProfile'])
     ->name('faculty.profile.update')
-    ->middleware(['auth', 'role:faculty', 'permission:faculty.profile.manage']);
+    ->middleware(['auth', 'role:faculty,director', 'permission:faculty.profile.manage,director.dashboard']);
 
 Route::post('/faculty/profile/photo/upload', [FacultyDashboardController::class, 'uploadPhoto'])
     ->name('faculty.profile.photo.upload')
-    ->middleware(['auth', 'role:faculty', 'permission:faculty.profile.manage']);
+    ->middleware(['auth', 'role:faculty,director', 'permission:faculty.profile.manage,director.dashboard']);
 
 Route::get('/faculty/profile/photos', [FacultyDashboardController::class, 'getPhotos'])
     ->name('faculty.profile.photos')
-    ->middleware(['auth', 'role:faculty', 'permission:faculty.profile.manage']);
+    ->middleware(['auth', 'role:faculty,director', 'permission:faculty.profile.manage,director.dashboard']);
 
 Route::post('/faculty/profile/photo/set-profile', [FacultyDashboardController::class, 'setProfilePhoto'])
     ->name('faculty.profile.photo.set-profile')
-    ->middleware(['auth', 'role:faculty', 'permission:faculty.profile.manage']);
+    ->middleware(['auth', 'role:faculty,director', 'permission:faculty.profile.manage,director.dashboard']);
 
 Route::delete('/faculty/profile/photo/{id}', [FacultyDashboardController::class, 'deletePhoto'])
     ->name('faculty.profile.photo.delete')
-    ->middleware(['auth', 'role:faculty', 'permission:faculty.profile.manage']);
+    ->middleware(['auth', 'role:faculty,director', 'permission:faculty.profile.manage,director.dashboard']);
 
 // IPCR Template Routes
 Route::get('/faculty/ipcr/templates', [IpcrTemplateController::class, 'index'])
@@ -359,7 +358,9 @@ Route::post('/dean/review/calibrations', [DeanReviewController::class, 'saveCali
 |--------------------------------------------------------------------------
 */
 
-Route::get('/director/dashboard', [DirectorDashboardController::class, 'index'])
+Route::get('/director/dashboard', function () {
+    return redirect()->route('faculty.dashboard');
+})
     ->name('director.dashboard')
     ->middleware(['auth', 'role:director', 'permission:director.dashboard']);
 
