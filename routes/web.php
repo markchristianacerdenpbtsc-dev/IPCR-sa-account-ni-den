@@ -21,7 +21,17 @@ use App\Http\Controllers\Faculty\OpcrSavedCopyController;
 use App\Http\Controllers\Faculty\OpcrExportController;
 use App\Http\Controllers\Faculty\IpcrImportController;
 use App\Http\Controllers\Dean\DeanReviewController;
+use App\Http\Controllers\GreetingController;
 use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Greeting Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/hello', [GreetingController::class, 'hello'])
+    ->name('hello');
 
 /*
 |--------------------------------------------------------------------------
