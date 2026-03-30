@@ -50,6 +50,11 @@ class UserSeeder extends Seeder
             'role' => 'dean',
         ]);
 
+        UserRole::create([
+            'user_id' => $dean->id,
+            'role' => 'faculty',
+        ]);
+
         // Create director user
         $director = User::create([
             'name' => 'Dr. Juan Dela Cruz',
@@ -104,6 +109,30 @@ class UserSeeder extends Seeder
 
         UserRole::create([
             'user_id' => $faculty2->id,
+            'role' => 'faculty',
+        ]);
+
+        // Create HR user (Faculty role)
+        $hr = User::create([
+            'name' => 'Ms. Patricia Gonzales',
+            'employee_id' => 'URS26-HR00001',
+            'username' => 'hr',
+            'email' => 'hr@ipcr.system',
+            'password' => Hash::make('password'),
+            'phone' => '09123456794',
+            'role' => 'faculty',
+            'department_id' => null,
+            'designation_id' => null,
+            'is_active' => true,
+        ]);
+
+        UserRole::create([
+            'user_id' => $hr->id,
+            'role' => 'hr',
+        ]);
+
+        UserRole::create([
+            'user_id' => $hr->id,
             'role' => 'faculty',
         ]);
     }

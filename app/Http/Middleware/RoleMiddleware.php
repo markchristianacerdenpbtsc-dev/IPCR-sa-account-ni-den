@@ -20,6 +20,8 @@ class RoleMiddleware
             return redirect()->route('login');
         }
 
+        $allowedRoles = array_map(static fn ($role) => trim($role), $roles);
+
         $user = auth()->user();
 
         // Admin users bypass all role checks (superuser)
@@ -28,7 +30,7 @@ class RoleMiddleware
         }
 
         // Check if user has any of the required roles
-        foreach ($roles as $role) {
+        foreach ($allowedRoles as $role) {
             if ($user->hasRole($role)) {
                 return $next($request);
             }
