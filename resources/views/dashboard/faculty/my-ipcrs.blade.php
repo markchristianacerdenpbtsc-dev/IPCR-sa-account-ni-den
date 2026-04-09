@@ -11,6 +11,14 @@
     @vite(['resources/css/dashboard_faculty_my-ipcrs.css', 'resources/js/dashboard_faculty_my-ipcrs.js'])
 </head>
 <body class="bg-gray-50" style="visibility: hidden;">
+    @php
+        $canAccessOpcr = auth()->user()->hasAnyRole(['dean', 'hr'])
+            && (
+                auth()->user()->hasPermission('dean.opcr.templates')
+            || auth()->user()->hasPermission('dean.opcr.submissions')
+            || auth()->user()->hasPermission('dean.opcr.saved-copies')
+            );
+    @endphp
     <!-- Navigation Header -->
     <nav class="bg-white shadow-sm border-b sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
@@ -239,7 +247,7 @@
                                 <button id="ipcrTab" class="pb-3 sm:pb-4 px-1 border-b-2 border-blue-600 font-semibold text-blue-600 text-sm sm:text-base whitespace-nowrap" onclick="switchTab('ipcr')">
                                     IPCR Drafts
                                 </button>
-                                @if(auth()->user()->hasRole('dean'))
+                                @if($canAccessOpcr)
                                 <button id="opcrTab" class="pb-3 sm:pb-4 px-1 border-b-2 border-transparent font-semibold text-gray-500 text-sm sm:text-base whitespace-nowrap hover:text-gray-700" onclick="switchTab('opcr')">
                                     OPCR Drafts
                                 </button>
@@ -307,7 +315,7 @@
                         @endif
                     </div>
 
-                    @if(auth()->user()->hasRole('dean'))
+                    @if($canAccessOpcr)
                     <!-- OPCR Content Area -->
                     <div id="createOpcrButtonArea" class="hidden">
                         <!-- OPCR Saved Copies (rendered via Blade) -->
@@ -437,7 +445,7 @@
                         </div>
                     </div>
 
-                    @if(auth()->user()->hasRole('dean'))
+                    @if($canAccessOpcr)
                     <!-- Create OPCR Modal -->
                     <div id="createOpcrModal" class="fixed inset-0 z-50 hidden">
                         <div class="absolute inset-0 bg-black/50" onclick="closeCreateOpcrModal()"></div>
@@ -518,7 +526,7 @@
                     </div>
                     @endif
 
-                    @if(auth()->user()->hasRole('dean'))
+                    @if($canAccessOpcr)
                     <!-- OPCR Document Modal -->
                     <div id="opcrDocumentContainer" class="fixed inset-0 z-50 hidden">
                         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
@@ -1086,7 +1094,7 @@
                     </div>
                 </div>
 
-                @if(auth()->user()->hasRole('dean'))
+                @if($canAccessOpcr)
                 <!-- OPCR Templates -->
                 <div id="opcrTemplatesSection" class="bg-white rounded-lg shadow-sm p-4 sm:p-6 hidden">
                     <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">OPCR Templates</h3>
@@ -1149,7 +1157,7 @@
                     </div>
                 </div>
 
-                @if(auth()->user()->hasRole('dean'))
+                @if($canAccessOpcr)
                 <!-- Submit OPCR -->
                 <div id="submitOpcrSection" class="bg-white rounded-lg shadow-sm p-4 sm:p-6 hidden">
                     <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Submit OPCR</h3>
@@ -1232,7 +1240,7 @@
         </div>
     </div>
 
-    @if(auth()->user()->hasRole('dean'))
+    @if($canAccessOpcr)
     <!-- Submit OPCR Modal -->
     <div id="submitOpcrModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full animate-scale-in">
@@ -2252,7 +2260,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             renderSavedCopies();
-            @if(auth()->user()->hasRole('dean'))
+            @if($canAccessOpcr)
             renderOpcrSavedCopies();
             @endif
             
@@ -3389,12 +3397,10 @@
                     showAlertModal('success', 'Success', `Template has been copied to ${docLabel} drafts`, function() {
                         // Close preview modal
                         closeTemplatePreview();
-                        // Refresh saved copies list
-                        if (docTypeToUse === 'opcr') {
-                            renderOpcrSavedCopies();
-                        } else {
-                            renderSavedCopies();
-                        }
+                        // Reload page to ensure UI reflects database state
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
                     });
                 } else {
                     showAlertModal('error', 'Error', data.message || 'Failed to use template as draft');
@@ -3418,11 +3424,14 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showAlertModal('success', 'Success', 'Template saved to Saved Copy successfully');
-                    // Close preview modal
-                    closeTemplatePreview();
-                    // Refresh saved copies list
-                    renderSavedCopies();
+                    showAlertModal('success', 'Success', 'Template saved to Saved Copy successfully', function() {
+                        // Close preview modal
+                        closeTemplatePreview();
+                        // Reload page to ensure UI reflects database state
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    });
                 } else {
                     showAlertModal('error', 'Error', data.message || 'Failed to save copy');
                 }

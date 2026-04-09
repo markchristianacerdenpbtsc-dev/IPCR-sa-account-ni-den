@@ -36,6 +36,7 @@ class DeanReviewController extends Controller
             ->pluck('id');
 
         $submissions = IpcrSubmission::whereIn('user_id', $facultyUserIds)
+            ->whereNotNull('submitted_at')
             ->with('user:id,name,employee_id')
             ->orderBy('submitted_at', 'desc')
             ->get()
@@ -77,6 +78,7 @@ class DeanReviewController extends Controller
 
         // The submission must belong to a user in the dean's department
         $submission = IpcrSubmission::where('id', $id)
+            ->whereNotNull('submitted_at')
             ->whereHas('user', function ($query) use ($departmentId, $user) {
                 $query->where('department_id', $departmentId)
                       ->where('id', '!=', $user->id);
@@ -131,6 +133,7 @@ class DeanReviewController extends Controller
             ->pluck('id');
 
         $submissions = IpcrSubmission::whereIn('user_id', $deanUserIds)
+            ->whereNotNull('submitted_at')
             ->with(['user:id,name,employee_id,department_id', 'user.department:id,name,code'])
             ->orderBy('submitted_at', 'desc')
             ->get()
@@ -174,6 +177,7 @@ class DeanReviewController extends Controller
             ->pluck('id');
 
         $submission = IpcrSubmission::where('id', $id)
+            ->whereNotNull('submitted_at')
             ->whereIn('user_id', $deanUserIds)
             ->with(['user:id,name,employee_id,department_id', 'user.department:id,name,code'])
             ->firstOrFail();
